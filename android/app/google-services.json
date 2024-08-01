@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "14833557415",
+    "project_id": "cookneat-4c30e",
+    "storage_bucket": "cookneat-4c30e.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:14833557415:android:9f29470a38f007aa52a082",
+        "android_client_info": {
+          "package_name": "com.example.cook_n_eat"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyC11U8VQaNDqtqMUuyygNsNCA-b7Gjfphw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
