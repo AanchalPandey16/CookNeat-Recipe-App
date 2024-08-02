@@ -1,10 +1,12 @@
 import 'dart:typed_data';
-import 'package:cook_n_eat/screens/recipedetail.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'add_recipe.dart';
+import 'login.dart';
+import 'recipedetail.dart'; // Adjust import based on file location
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -15,9 +17,9 @@ class Profile extends StatefulWidget {
 
 class _ProfileState extends State<Profile> {
   Uint8List? _image;
-  String _username = ''; 
-  String _bio = ''; 
-  String _profileImageUrl = ''; // Current profile image URL
+  String _username = '';
+  String _bio = '';
+  String _profileImageUrl = '';
   final FirebaseStorage _storage = FirebaseStorage.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseAuth _auth = FirebaseAuth.instance;
@@ -31,13 +33,18 @@ class _ProfileState extends State<Profile> {
   Future<void> _loadUserProfile() async {
     User? user = _auth.currentUser;
     if (user != null) {
-      DocumentSnapshot profileSnapshot = await _firestore.collection('profiles').doc(user.uid).get();
+      DocumentSnapshot profileSnapshot =
+          await _firestore.collection('profiles').doc(user.uid).get();
       if (profileSnapshot.exists) {
-        setState(() {
-          _username = profileSnapshot['username'] ?? '';
-          _bio = profileSnapshot['bio'] ?? '';
-          _profileImageUrl = profileSnapshot['profileImage'] ?? '';
-        });
+        if (mounted) {
+          setState(() {
+            _username = profileSnapshot['username'] ?? '';
+            _bio = profileSnapshot['bio'] ?? '';
+            _profileImageUrl = profileSnapshot['profileImage'] ?? '';
+            // Debug print to verify URL
+            print('Loaded profile image URL: $_profileImageUrl');
+          });
+        }
       }
     }
   }
@@ -45,14 +52,17 @@ class _ProfileState extends State<Profile> {
   Future<void> selectImage() async {
     try {
       final ImagePicker _imagePicker = ImagePicker();
-      final XFile? pickedFile = await _imagePicker.pickImage(source: ImageSource.gallery);
+      final XFile? pickedFile =
+          await _imagePicker.pickImage(source: ImageSource.gallery);
 
       if (pickedFile != null) {
         final Uint8List imageBytes = await pickedFile.readAsBytes();
-        setState(() {
-          _image = imageBytes;
-        });
-        // Upload the image in the background
+        if (mounted) {
+          setState(() {
+            _image = imageBytes;
+          });
+        }
+        
         _uploadImageAndSaveProfile(imageBytes);
       } else {
         print('No image selected');
@@ -64,7 +74,8 @@ class _ProfileState extends State<Profile> {
 
   Future<String?> uploadImage(Uint8List imageBytes) async {
     try {
-      String fileName = 'profile_pictures/${DateTime.now().millisecondsSinceEpoch}.jpg';
+      String fileName =
+          'profile_pictures/${DateTime.now().millisecondsSinceEpoch}.jpg';
       Reference storageRef = _storage.ref().child(fileName);
       UploadTask uploadTask = storageRef.putData(imageBytes);
       TaskSnapshot taskSnapshot = await uploadTask;
@@ -87,7 +98,15 @@ class _ProfileState extends State<Profile> {
 
   Future<void> _uploadImageAndSaveProfile(Uint8List imageBytes) async {
     String? imageUrl = await uploadImage(imageBytes);
-    await _saveProfile(imageUrl: imageUrl);
+    if (imageUrl != null) {
+      await _saveProfile(imageUrl: imageUrl);
+      if (mounted) {
+        setState(() {
+          _profileImageUrl = imageUrl; // Ensure this is updated
+          _image = null;
+        });
+      }
+    }
   }
 
   Future<void> removeImage() async {
@@ -95,10 +114,12 @@ class _ProfileState extends State<Profile> {
       await deleteImage(_profileImageUrl);
     }
     await _saveProfile(imageUrl: '');
-    setState(() {
-      _profileImageUrl = '';
-      _image = null;
-    });
+    if (mounted) {
+      setState(() {
+        _profileImageUrl = '';
+        _image = null;
+      });
+    }
   }
 
   Future<void> _saveProfile({String? imageUrl}) async {
@@ -109,7 +130,11 @@ class _ProfileState extends State<Profile> {
           'username': _username,
           'bio': _bio,
           'profileImage': imageUrl ?? _profileImageUrl,
-        }, SetOptions(merge: true));
+        }, SetOptions(merge: true)).then((_) {
+          print('Profile updated with image URL: $imageUrl');
+        }).catchError((error) {
+          print('Failed to update profile: $error');
+        });
       } catch (e) {
         print('Error saving profile: $e');
       }
@@ -166,12 +191,15 @@ class _ProfileState extends State<Profile> {
             TextButton(
               onPressed: () {
                 if (_controller.text.isNotEmpty) {
-                  setState(() {
-                    _username = _controller.text;
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _username = _controller.text;
+                    });
+                  }
                   Navigator.pop(context);
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Username cannot be empty')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Username cannot be empty')));
                 }
               },
               child: Text('Save'),
@@ -207,12 +235,15 @@ class _ProfileState extends State<Profile> {
             TextButton(
               onPressed: () {
                 if (_controller.text.isNotEmpty) {
-                  setState(() {
-                    _bio = _controller.text;
-                  });
+                  if (mounted) {
+                    setState(() {
+                      _bio = _controller.text;
+                    });
+                  }
                   Navigator.pop(context);
                 } else {
-                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Bio cannot be empty')));
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Bio cannot be empty')));
                 }
               },
               child: Text('Save'),
@@ -240,11 +271,49 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  void _showSettingsDialog() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              ListTile(
+                leading: Icon(Icons.logout, color: Colors.red),
+                title: Text('Logout'),
+                onTap: () async {
+                  await _auth.signOut();
+                  Navigator.pop(context);
+                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                },
+              ),
+              ListTile(
+                leading: Icon(Icons.save),
+                title: Text('Save Profile'),
+                onTap: () {
+                  Navigator.pop(context);
+                  saveProfile();
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+
+  @override
+  void dispose() {
+    // Cancel any ongoing tasks if necessary
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile'),
+        title: Text('Profile', style: TextStyle(color: Colors.black)),
         backgroundColor: Colors.white,
         elevation: 1,
         iconTheme: IconThemeData(color: Colors.black),
@@ -254,23 +323,26 @@ class _ProfileState extends State<Profile> {
             Navigator.pop(context);
           },
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings, color: Colors.black),
+            onPressed: _showSettingsDialog,
+          ),
+        ],
       ),
       body: SingleChildScrollView(
         child: Column(
           children: [
-            SizedBox(height: 20), // Padding from the top
 
-            // Profile Picture, Username, and Bio Section
-            Padding(
-              padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            Container(
+              padding: const EdgeInsets.all(16.0),
               child: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   GestureDetector(
                     onTap: _showOptionsDialog,
                     child: CircleAvatar(
                       radius: 70,
-                      backgroundColor: Colors.grey[300],
+                      backgroundColor: Colors.grey[200],
                       child: _image != null
                           ? ClipOval(
                               child: Image.memory(
@@ -289,18 +361,14 @@ class _ProfileState extends State<Profile> {
                                     height: 140,
                                   ),
                                 )
-                              : ClipOval(
-                                  child: Image.network(
-                                    'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcRgkL2Fnam9wpeHJuVZ_dHapQFwK3_qw9V1-w&s',
-                                    fit: BoxFit.cover,
-                                    width: 140,
-                                    height: 140,
-                                  ),
+                              : Icon(
+                                  Icons.camera_alt,
+                                  size: 50,
+                                  color: Colors.grey[700],
                                 ),
                     ),
                   ),
-                  SizedBox(width: 20),
-                  
+                  SizedBox(width: 16.0),
                   Expanded(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -308,18 +376,18 @@ class _ProfileState extends State<Profile> {
                         GestureDetector(
                           onTap: _showUsernameDialog,
                           child: Text(
-                            _username.isEmpty ? 'Username' : _username,
+                            _username.isNotEmpty ? _username : 'Set your username',
                             style: TextStyle(
-                              fontSize: 20.0,
+                              fontSize: 24.0,
                               fontWeight: FontWeight.bold,
                             ),
                           ),
                         ),
-                        SizedBox(height: 5),
+                        SizedBox(height: 8.0),
                         GestureDetector(
                           onTap: _showBioDialog,
                           child: Text(
-                            _bio.isEmpty ? 'Bio' : _bio,
+                            _bio.isNotEmpty ? _bio : 'Set your bio',
                             style: TextStyle(
                               fontSize: 16.0,
                               color: Colors.grey[600],
@@ -332,29 +400,34 @@ class _ProfileState extends State<Profile> {
                 ],
               ),
             ),
-            SizedBox(height: 20),
-
-            // Save Button
-            Padding(
-              padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: saveProfile,
-                child: Text('Save Profile'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, // Background color
-                ),
-              ),
+            Divider(
+              thickness: 1.0,
+              color: Colors.grey,
+              indent: 16.0,
+              endIndent: 16.0,
             ),
-            
-            // My Recipes Button
-            Padding(
+            // Lower Box: Navigation Buttons
+            Container(
               padding: const EdgeInsets.all(16.0),
-              child: ElevatedButton(
-                onPressed: _navigateToMyRecipes,
-                child: Text('My Recipes'),
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: Colors.blue, 
-                ),
+              child: Column(
+                children: [
+                  ListTile(
+                    leading: Icon(Icons.book, color: Colors.black),
+                    title: Text('My Recipes', style: TextStyle(color: Colors.black)),
+                    onTap: _navigateToMyRecipes,
+                  ),
+                  Divider(),
+                  ListTile(
+                    leading: Icon(Icons.add_circle, color: Colors.black),
+                    title: Text('Add Recipe', style: TextStyle(color: Colors.black)),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => AddRecipe()),
+                      );
+                    },
+                  ),
+                ],
               ),
             ),
           ],

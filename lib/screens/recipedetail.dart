@@ -1,24 +1,38 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 
+
+// Helper function to convert Google Storage URLs to HTTP URLs
 Future<String> convertGsToHttp(String gsUrl) async {
   final ref = FirebaseStorage.instance.refFromURL(gsUrl);
   String downloadURL = await ref.getDownloadURL();
   return downloadURL;
 }
-
 class RecipeList extends StatelessWidget {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
+    // Get the current user ID
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+
+    if (userId == null) {
+      return Scaffold(
+        body: Center(child: Text('User not logged in')),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Text('My Recipes'),
       ),
       body: StreamBuilder<QuerySnapshot>(
-        stream: _firestore.collection('Recipe').snapshots(),
+        stream: _firestore
+            .collection('recipes')
+            .where('userId', isEqualTo: userId)
+            .snapshots(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return Center(child: CircularProgressIndicator());
@@ -36,7 +50,6 @@ class RecipeList extends StatelessWidget {
 
           return GridView.builder(
             padding: EdgeInsets.all(10.0),
-            scrollDirection: Axis.vertical,
             gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
               crossAxisCount: 2,
               crossAxisSpacing: 10.0,
@@ -48,11 +61,9 @@ class RecipeList extends StatelessWidget {
               final recipe = recipes[index].data() as Map<String, dynamic>;
 
               return Container(
-               
-                height: 200,
                 padding: EdgeInsets.all(10.0),
                 decoration: BoxDecoration(
-                color: Colors.white,
+                  color: Colors.white,
                   borderRadius: BorderRadius.circular(10.0),
                   boxShadow: [
                     BoxShadow(
@@ -76,34 +87,21 @@ class RecipeList extends StatelessWidget {
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
                       if (recipe['image'] != null)
-                        FutureBuilder<String>(
-                          future: convertGsToHttp(recipe['image']),
-                          builder: (context, snapshot) {
-                            if (snapshot.connectionState == ConnectionState.waiting) {
-                              return Center(child: CircularProgressIndicator());
-                            }
-                            if (snapshot.hasError || !snapshot.hasData) {
-                              return Icon(Icons.error);
-                            }
-                            return ClipRRect(
-                              borderRadius: BorderRadius.circular(8.0),
-                              child: Image.network(
-                                snapshot.data!,
-                                width: double.infinity,
-                                height: 160, 
-                                fit: BoxFit.cover,
-                                errorBuilder: (context, error, stackTrace) {
-                                  return Icon(Icons.error);
-                                },
-                              ),
-                            );
+                        Image.network(
+                          recipe['image'],
+                          width: double.infinity,
+                          height: 160,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Icon(Icons.error);
                           },
                         ),
                       SizedBox(height: 10),
                       Text(
                         recipe['name'] ?? 'No Name',
                         style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                        maxLines: 5,
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
                       ),
                       SizedBox(height: 5),
                       Text(recipe['ingredients'] ?? 'No Ingredients'),
@@ -125,12 +123,6 @@ class RecipeDetail extends StatelessWidget {
 
   RecipeDetail({required this.recipe});
 
-  Future<String> convertGsToHttp(String gsUrl) async {
-    final ref = FirebaseStorage.instance.refFromURL(gsUrl);
-    String downloadURL = await ref.getDownloadURL();
-    return downloadURL;
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -144,30 +136,16 @@ class RecipeDetail extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               if (recipe['image'] != null)
-                FutureBuilder<String>(
-                  future: convertGsToHttp(recipe['image']),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(child: CircularProgressIndicator());
-                    }
-                    if (snapshot.hasError || !snapshot.hasData) {
-                      return Icon(Icons.error, size: 100);
-                    }
-                    return ClipRRect(
-                      borderRadius: BorderRadius.circular(8.0),
-                      child: Image.network(
-                        snapshot.data!,
-                        width: double.infinity,
-                        height: 200,
-                        fit: BoxFit.cover,
-                        errorBuilder: (context, error, stackTrace) {
-                          return Icon(Icons.error, size: 100);
-                        },
-                      ),
-                    );
+                Image.network(
+                  recipe['image'],
+                  width: double.infinity,
+                  height: 200,
+                  fit: BoxFit.cover,
+                  errorBuilder: (context, error, stackTrace) {
+                    return Icon(Icons.error, size: 100);
                   },
                 ),
-              SizedBox(height: 20), // Reduced the height to 20
+              SizedBox(height: 20),
               Text(
                 'Ingredients',
                 style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),

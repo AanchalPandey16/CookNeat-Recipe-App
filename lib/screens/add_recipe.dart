@@ -4,6 +4,7 @@ import 'package:image_picker/image_picker.dart';
 import 'dart:io';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:random_string/random_string.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class AddRecipe extends StatefulWidget {
   const AddRecipe({super.key});
@@ -36,33 +37,49 @@ class _AddRecipeState extends State<AddRecipe> {
         recipeNameController.text.isNotEmpty &&
         ingredientsController.text.isNotEmpty &&
         stepsController.text.isNotEmpty) {
-      String addId = randomAlphaNumeric(10);
+      try {
+        String addId = randomAlphaNumeric(10);
+        User? user = FirebaseAuth.instance.currentUser;
 
-      Reference firebaseStorageRef =
-          FirebaseStorage.instance.ref().child("recipeImages").child(addId);
+        if (user != null) {
+          String userId = user.uid;
 
-      final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
-      var downloadUrl = await (await task).ref.getDownloadURL();
+          // Upload image to Firebase Storage
+          Reference firebaseStorageRef =
+              FirebaseStorage.instance.ref().child("recipeImages").child(addId);
+          final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
+          var downloadUrl = await (await task).ref.getDownloadURL();
 
-      Map<String, dynamic> addRecipe = {
-        "name": recipeNameController.text,
-        "ingredients": ingredientsController.text,
-        "steps": stepsController.text,
-        "image": downloadUrl,
-      };
+          // Create recipe data with userId
+          Map<String, dynamic> addRecipe = {
+            "name": recipeNameController.text,
+            "ingredients": ingredientsController.text,
+            "steps": stepsController.text,
+            "image": downloadUrl,
+            "userId": userId, 
+          };
 
-      await DatabaseMethods().addRecipe(addRecipe);
+          // Save recipe under user's ID in Firestore
+          await DatabaseMethods().addRecipe(addRecipe);
 
-      recipeNameController.clear();
-      ingredientsController.clear();
-      stepsController.clear();
-      setState(() {
-        selectedImage = null;
-      });
+          // Clear fields and reset state
+          recipeNameController.clear();
+          ingredientsController.clear();
+          stepsController.clear();
+          setState(() {
+            selectedImage = null;
+          });
 
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Recipe added successfully')),
-      );
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text('Recipe added successfully')),
+          );
+        }
+      } catch (e) {
+        print('Error adding recipe: $e');
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Failed to add recipe')),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text('Please fill all fields and select an image')),
@@ -73,6 +90,12 @@ class _AddRecipeState extends State<AddRecipe> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: Text('Add Recipe', style: TextStyle(color: Colors.black)),
+        backgroundColor: Colors.white,
+        elevation: 1,
+        iconTheme: IconThemeData(color: Colors.black),
+      ),
       body: SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.only(
@@ -84,8 +107,8 @@ class _AddRecipeState extends State<AddRecipe> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Text('Add Recipe',
-                      style:
-                          TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                      style: TextStyle(
+                          fontSize: 20, fontWeight: FontWeight.bold)),
                 ],
               ),
               SizedBox(height: 20.0),
