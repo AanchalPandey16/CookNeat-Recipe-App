@@ -1,8 +1,12 @@
+import 'package:cook_n_eat/screens/bottomnav.dart';
+import 'package:cook_n_eat/screens/forgotpass.dart';
 import 'package:cook_n_eat/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/signin.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+
 class Login extends StatefulWidget {
   const Login({super.key});
 
@@ -52,17 +56,22 @@ class _LoginState extends State<Login> {
       final email = emailController.text.trim();
       final password = passwordController.text.trim();
 
-      final user = await _authService.loginWithEmailAndPassword(email, password);
+      final user =
+          await _authService.loginWithEmailAndPassword(email, password);
 
       if (user != null) {
+        SharedPreferences prefs;
+        prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLogin', true);
         Navigator.pushReplacement(
           context,
-          MaterialPageRoute(builder: (context) => Homepage()),
+          MaterialPageRoute(builder: (context) => Bottomnav()),
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Login failed. Please check your credentials and try again.'),
+            content: Text(
+                'Login failed. Please check your credentials and try again.'),
           ),
         );
       }
@@ -119,11 +128,13 @@ class _LoginState extends State<Login> {
                           controller: emailController,
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: Icon(Icons.email, color: Colors.orange.shade900),
+                            prefixIcon: Icon(Icons.email,
+                                color: Colors.orange.shade900),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
                           ),
                           keyboardType: TextInputType.emailAddress,
                           validator: _validateEmail,
@@ -133,10 +144,13 @@ class _LoginState extends State<Login> {
                           controller: passwordController,
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            prefixIcon: Icon(Icons.lock, color: Colors.orange.shade900),
+                            prefixIcon:
+                                Icon(Icons.lock, color: Colors.orange.shade900),
                             suffixIcon: IconButton(
                               icon: Icon(
-                                _obscureText ? Icons.visibility : Icons.visibility_off,
+                                _obscureText
+                                    ? Icons.visibility
+                                    : Icons.visibility_off,
                                 color: Colors.orange.shade900,
                               ),
                               onPressed: () {
@@ -148,7 +162,8 @@ class _LoginState extends State<Login> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
-                            contentPadding: EdgeInsets.symmetric(horizontal: 20, vertical: 15),
+                            contentPadding: EdgeInsets.symmetric(
+                                horizontal: 20, vertical: 15),
                           ),
                           obscureText: _obscureText,
                           validator: _validatePassword,
@@ -158,7 +173,10 @@ class _LoginState extends State<Login> {
                           alignment: Alignment.centerRight,
                           child: TextButton(
                             onPressed: () {
-                              // Forgot password logic here
+                              Navigator.push(context,
+                                  MaterialPageRoute(builder: (context) {
+                                return Forgotpass();
+                              }));
                             },
                             child: Text(
                               'Forgot Password?',
@@ -201,7 +219,8 @@ class _LoginState extends State<Login> {
                               onPressed: () {
                                 Navigator.push(
                                   context,
-                                  MaterialPageRoute(builder: (context) => SignIn()),
+                                  MaterialPageRoute(
+                                      builder: (context) => SignIn()),
                                 );
                               },
                               child: Text(

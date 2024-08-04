@@ -4,9 +4,10 @@ import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'add_recipe.dart';
 import 'login.dart';
-import 'recipedetail.dart'; // Adjust import based on file location
+import 'recipedetail.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -62,7 +63,7 @@ class _ProfileState extends State<Profile> {
             _image = imageBytes;
           });
         }
-        
+
         _uploadImageAndSaveProfile(imageBytes);
       } else {
         print('No image selected');
@@ -102,7 +103,7 @@ class _ProfileState extends State<Profile> {
       await _saveProfile(imageUrl: imageUrl);
       if (mounted) {
         setState(() {
-          _profileImageUrl = imageUrl; // Ensure this is updated
+          _profileImageUrl = imageUrl;
           _image = null;
         });
       }
@@ -283,9 +284,13 @@ class _ProfileState extends State<Profile> {
                 leading: Icon(Icons.logout, color: Colors.red),
                 title: Text('Logout'),
                 onTap: () async {
+                  SharedPreferences prefs;
+                  prefs = await SharedPreferences.getInstance();
+                  prefs.setBool('isLogin', false);
                   await _auth.signOut();
                   Navigator.pop(context);
-                  Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+                  Navigator.push(context,
+                      MaterialPageRoute(builder: (context) => Login()));
                 },
               ),
               ListTile(
@@ -303,11 +308,8 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  
-
   @override
   void dispose() {
-    
     super.dispose();
   }
 
@@ -335,7 +337,6 @@ class _ProfileState extends State<Profile> {
       body: SingleChildScrollView(
         child: Column(
           children: [
-
             Container(
               padding: const EdgeInsets.all(16.0),
               child: Row(
@@ -378,7 +379,9 @@ class _ProfileState extends State<Profile> {
                         GestureDetector(
                           onTap: _showUsernameDialog,
                           child: Text(
-                            _username.isNotEmpty ? _username : 'Set your username',
+                            _username.isNotEmpty
+                                ? _username
+                                : 'Set your username',
                             style: TextStyle(
                               fontSize: 24.0,
                               fontWeight: FontWeight.bold,
@@ -415,13 +418,15 @@ class _ProfileState extends State<Profile> {
                 children: [
                   ListTile(
                     leading: Icon(Icons.book, color: Colors.black),
-                    title: Text('My Recipes', style: TextStyle(color: Colors.black)),
+                    title: Text('My Recipes',
+                        style: TextStyle(color: Colors.black)),
                     onTap: _navigateToMyRecipes,
                   ),
                   Divider(),
                   ListTile(
                     leading: Icon(Icons.add_circle, color: Colors.black),
-                    title: Text('Add Recipe', style: TextStyle(color: Colors.black)),
+                    title: Text('Add Recipe',
+                        style: TextStyle(color: Colors.black)),
                     onTap: () {
                       Navigator.push(
                         context,

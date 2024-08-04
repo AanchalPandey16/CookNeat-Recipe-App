@@ -1,7 +1,10 @@
+import 'package:cook_n_eat/screens/bottomnav.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/scroll.dart';
 import 'package:flutter/material.dart';
-import 'dart:async'; 
+import 'dart:async';
+
+import 'package:shared_preferences/shared_preferences.dart'; 
 
 
 class Splash extends StatefulWidget {
@@ -12,19 +15,35 @@ class Splash extends StatefulWidget {
 }
 
 class _SplashState extends State<Splash> {
+ 
   @override
   void initState() {
     super.initState();
+
     _startTimer();
   }
 
-  void _startTimer() {
+ void _startTimer() async{
+   SharedPreferences prefs;
+prefs = await SharedPreferences.getInstance();
+  if(prefs.getBool('isLogin')==true)
+  {
+Timer(const Duration(seconds: 3), () {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => const Bottomnav())
+        );
+    });
+  }
+  else{
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Register())
         );
     });
+  }
+    
   }
 
   @override

@@ -39,6 +39,7 @@ dependencies:
   http: 
   google_sign_in: 
   firebase_auth: 
+  shared_preferences: 
  
     
 

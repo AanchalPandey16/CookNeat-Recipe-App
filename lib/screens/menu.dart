@@ -2,7 +2,6 @@ import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/profilepage.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/recipelist.dart'; // Ensure this path is correct
-// Ensure this path is correct
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
@@ -12,32 +11,6 @@ class Menu extends StatefulWidget {
 }
 
 class _MenuState extends State<Menu> {
-  int _selectedIndex = 1; // Set default to Menu
-
-  void _onItemTapped(int index) {
-    setState(() {
-      _selectedIndex = index;
-    });
-
-    switch (index) {
-      case 0:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Homepage()),
-        );
-        break;
-      case 1:
-        // Current screen, no action needed
-        break;
-      case 2:
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => Profile()),
-        );
-        break;
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     final List<Map<String, String>> categories = [
@@ -79,24 +52,6 @@ class _MenuState extends State<Menu> {
             );
           }).toList(),
         ),
-      ),
-      bottomNavigationBar: BottomNavigationBar(
-        items: const <BottomNavigationBarItem>[
-          BottomNavigationBarItem(
-            icon: Icon(Icons.home),
-            label: 'Home',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.restaurant_menu),
-            label: 'Menu',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(Icons.person),
-            label: 'Profile',
-          ),
-        ],
-        currentIndex: _selectedIndex,
-        onTap: _onItemTapped,
       ),
     );
   }
