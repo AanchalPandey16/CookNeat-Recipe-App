@@ -1,8 +1,42 @@
+import 'package:cook_n_eat/screens/homepage.dart';
+import 'package:cook_n_eat/screens/profilepage.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/recipelist.dart'; // Ensure this path is correct
+// Ensure this path is correct
 
-class Menu extends StatelessWidget {
+class Menu extends StatefulWidget {
   const Menu({super.key});
+
+  @override
+  _MenuState createState() => _MenuState();
+}
+
+class _MenuState extends State<Menu> {
+  int _selectedIndex = 1; // Set default to Menu
+
+  void _onItemTapped(int index) {
+    setState(() {
+      _selectedIndex = index;
+    });
+
+    switch (index) {
+      case 0:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Homepage()),
+        );
+        break;
+      case 1:
+        // Current screen, no action needed
+        break;
+      case 2:
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Profile()),
+        );
+        break;
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -46,6 +80,24 @@ class Menu extends StatelessWidget {
           }).toList(),
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        items: const <BottomNavigationBarItem>[
+          BottomNavigationBarItem(
+            icon: Icon(Icons.home),
+            label: 'Home',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.restaurant_menu),
+            label: 'Menu',
+          ),
+          BottomNavigationBarItem(
+            icon: Icon(Icons.person),
+            label: 'Profile',
+          ),
+        ],
+        currentIndex: _selectedIndex,
+        onTap: _onItemTapped,
+      ),
     );
   }
 
@@ -60,8 +112,8 @@ class Menu extends StatelessWidget {
         );
       },
       child: Container(
-        width: MediaQuery.of(context).size.width, 
-        height: 200.0, 
+        width: MediaQuery.of(context).size.width,
+        height: 200.0,
         child: Stack(
           fit: StackFit.expand,
           children: [
@@ -69,22 +121,22 @@ class Menu extends StatelessWidget {
               borderRadius: BorderRadius.circular(8.0),
               child: Image.network(
                 imageUrl,
-                fit: BoxFit.cover, 
+                fit: BoxFit.cover,
               ),
             ),
             Positioned(
-              bottom: 0, 
+              bottom: 0,
               left: 0,
               right: 0,
               child: Container(
-                color: Colors.black54, 
+                color: Colors.black54,
                 padding: EdgeInsets.all(12.0),
                 child: Text(
                   category,
                   style: TextStyle(
-                    fontSize: 16.0, 
+                    fontSize: 16.0,
                     fontWeight: FontWeight.bold,
-                    color: Colors.white, 
+                    color: Colors.white,
                   ),
                   textAlign: TextAlign.start,
                 ),

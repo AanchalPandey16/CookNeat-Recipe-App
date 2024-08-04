@@ -90,156 +90,141 @@ class _AddRecipeState extends State<AddRecipe> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Add Recipe', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
-        elevation: 1,
-        iconTheme: IconThemeData(color: Colors.black),
-      ),
-      body: SingleChildScrollView(
-        child: Padding(
-          padding: const EdgeInsets.only(
-              top: 50.0, left: 20.0, right: 20.0, bottom: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                children: [
-                  Text('Add Recipe',
-                      style: TextStyle(
-                          fontSize: 20, fontWeight: FontWeight.bold)),
-                ],
-              ),
-              SizedBox(height: 20.0),
-              Center(
-                child: GestureDetector(
-                  onTap: getImage,
-                  child: Container(
-                    width: 200,
-                    height: 200,
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(30.0),
-                      border: Border.all(),
-                    ),
-                    child: selectedImage == null
-                        ? Icon(Icons.camera_alt_outlined)
-                        : ClipRRect(
-                            borderRadius: BorderRadius.circular(30.0),
-                            child: Image.file(
-                              selectedImage!,
-                              width: 200,
-                              height: 200,
-                              fit: BoxFit.cover,
-                            ),
-                          ),
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.0),
-              Text('Recipe Name:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10.0),
-              Container(
-                padding: EdgeInsets.only(left: 10.0),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: TextField(
-                  controller: recipeNameController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: '  Name of your dish',
-                  ),
-                ),
-              ),
-              SizedBox(height: 20.0),
-              Text('Ingredients:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10.0),
-              Container(
-                padding: EdgeInsets.only(left: 10.0),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: TextField(
-                  controller: ingredientsController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: '  From what you made your dish',
-                  ),
-                  maxLines: 5,
-                ),
-              ),
-              SizedBox(height: 20.0),
-              Text('Steps to Make:',
-                  style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-              SizedBox(height: 10.0),
-              Container(
-                padding: EdgeInsets.only(left: 10.0),
-                width: MediaQuery.of(context).size.width,
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  border: Border.all(),
-                  borderRadius: BorderRadius.circular(15.0),
-                ),
-                child: TextField(
-                  controller: stepsController,
-                  decoration: InputDecoration(
-                    border: InputBorder.none,
-                    hintText: '  How did you make it',
-                  ),
-                  maxLines: 5,
-                ),
-              ),
-              SizedBox(height: 20.0),
-              Container(
-                decoration: BoxDecoration(
-                  gradient: LinearGradient(
-                    colors: [Color.fromARGB(255, 222, 80, 70), Colors.orange],
-                    begin: Alignment.topLeft,
-                    end: Alignment.bottomRight,
-                  ),
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                width: MediaQuery.of(context).size.width,
-                child: Center(
-                  child: ElevatedButton(
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: Colors.transparent,
-                      shadowColor: Colors.transparent,
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10.0),
-                      ),
-                      padding: EdgeInsets.symmetric(vertical: 15.0),
-                    ),
-                    onPressed: uploadItem,
-                    child: Text('Save',
-                        style: TextStyle(
-                            color: Colors.white,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 16.0,
-                            shadows: [
-                              Shadow(
-                                blurRadius: 5.0,
-                                color: Colors.black45,
-                                offset: Offset(2.0, 2.0),
-                              ),
-                            ])),
-                  ),
-                ),
-              ),
-            ],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: Container(
+          decoration: BoxDecoration(
+            gradient: LinearGradient(
+              colors: [Colors.orange[200]!, Colors.orange[400]!],
+              begin: Alignment.topLeft,
+              end: Alignment.bottomRight,
+            ),
+          ),
+          child: AppBar(
+            title: Text('Add Recipe', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            backgroundColor: Colors.transparent,
+            elevation: 0,
+            iconTheme: IconThemeData(color: Colors.black),
           ),
         ),
       ),
+      body: Container(
+        decoration: BoxDecoration(
+          gradient: LinearGradient(
+            colors: [Colors.orange[100]!, Colors.orange[300]!],
+            begin: Alignment.topLeft,
+            end: Alignment.bottomRight,
+          ),
+        ),
+        child: SingleChildScrollView(
+          child: Padding(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Center(
+                  child: GestureDetector(
+                    onTap: getImage,
+                    child: Container(
+                      width: MediaQuery.of(context).size.width * 0.9,
+                      height: MediaQuery.of(context).size.width * 0.6,
+                      decoration: BoxDecoration(
+                        color: Colors.grey[200],
+                        borderRadius: BorderRadius.circular(12.0),
+                        border: Border.all(color: Colors.grey[400]!),
+                      ),
+                      child: selectedImage == null
+                          ? Icon(Icons.camera_alt_outlined, size: 50, color: Colors.grey)
+                          : ClipRRect(
+                              borderRadius: BorderRadius.circular(12.0),
+                              child: Image.file(
+                                selectedImage!,
+                                width: double.infinity,
+                                height: double.infinity,
+                                fit: BoxFit.cover,
+                              ),
+                            ),
+                    ),
+                  ),
+                ),
+                SizedBox(height: 20.0),
+                _buildTextField(
+                  controller: recipeNameController,
+                  label: 'Recipe Name',
+                  hintText: 'Enter the name of your dish',
+                  minLines: 1,
+                ),
+                SizedBox(height: 20.0),
+                _buildTextField(
+                  controller: ingredientsController,
+                  label: 'Ingredients',
+                  hintText: 'List the ingredients used',
+                  minLines: 3,
+                ),
+                SizedBox(height: 20.0),
+                _buildTextField(
+                  controller: stepsController,
+                  label: 'Steps to Make',
+                  hintText: 'Describe the steps to make the dish',
+                  minLines: 3,
+                ),
+                SizedBox(height: 20.0),
+                Center(
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      foregroundColor: Colors.white,
+                      backgroundColor: Color.fromARGB(255, 231, 105, 67),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                      padding: EdgeInsets.symmetric(horizontal: 160.0, vertical: 15.0),
+                      elevation: 5.0,
+                    ),
+                    onPressed: uploadItem,
+                    child: Text('Save', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                  ),
+                ),
+              ],
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTextField({
+    required TextEditingController controller,
+    required String label,
+    required String hintText,
+    int minLines = 1,
+  }) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          label,
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+        ),
+        SizedBox(height: 8.0),
+        Container(
+          padding: EdgeInsets.symmetric(horizontal: 12.0),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            border: Border.all(color: Colors.grey[300]!),
+            borderRadius: BorderRadius.circular(12.0),
+          ),
+          child: TextField(
+            controller: controller,
+            decoration: InputDecoration(
+              border: InputBorder.none,
+              hintText: hintText,
+              hintStyle: TextStyle(color: Colors.grey[600]),
+            ),
+            minLines: minLines,
+            maxLines: null, // Allows the field to expand vertically
+          ),
+        ),
+      ],
     );
   }
 }

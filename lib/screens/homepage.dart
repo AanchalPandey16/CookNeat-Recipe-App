@@ -1,3 +1,4 @@
+import 'package:cook_n_eat/screens/recipedetail.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:cook_n_eat/screens/add_recipe.dart';
@@ -79,12 +80,6 @@ class _HomepageState extends State<Homepage> {
         );
         break;
       case 2:
-        Navigator.push(
-          context,
-          MaterialPageRoute(builder: (context) => const AddRecipe()),
-        );
-        break;
-      case 3:
         Navigator.push(
           context,
           MaterialPageRoute(builder: (context) => Profile()),
@@ -190,88 +185,88 @@ class _HomepageState extends State<Homepage> {
               ),
               SizedBox(height: 10),
               Container(
-                height: 170,
+                height: 200,
                 child: ListView(
                   scrollDirection: Axis.horizontal,
                   children: [
-                    _buildCategoryCard('assets/salad.png', 'Salad Recipes'),
-                    _buildCategoryCard('assets/chinese.png', 'Chinese Recipes'),
-                    _buildCategoryCard('assets/pasta.jpeg', 'Pasta Recipes'),
-                    _buildCategoryCard('assets/soup.jpeg', 'Soup Recipes'),
+                    _buildCategoryItem(context, 'Vegetarian', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fvegetarian.jpg?alt=media&token=b703ffcf-53ae-4265-b53b-69da4a2e4d52'),
+                    _buildCategoryItem(context, 'Desserts', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fdesserts.jpg?alt=media&token=02153b7a-5476-434f-8ee3-f34c1b4a1cca'),
+                    _buildCategoryItem(context, 'Snacks', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fsnacks.jpg?alt=media&token=2b4b2a27-0e9d-4011-a5c4-b604af02ce60'),
+                    _buildCategoryItem(context, 'Non-Vegetarian', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fnonvef.jpg?alt=media&token=a796a141-6b65-45a0-b41f-15a39ad56d14'),
+                    _buildCategoryItem(context, 'Quick & Easy', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fquick%20easy.jpg?alt=media&token=1f840063-1314-49ad-98d5-67fdcea31c38'),
+                    _buildCategoryItem(context, 'Soups', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fsoup.jpg?alt=media&token=c975b14e-481f-493d-bc23-361d71be377d'),
+                    _buildCategoryItem(context, 'Salads', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fsalad.jpg?alt=media&token=35b2f112-4b69-40c3-b666-6fae69de36c7'),
+                    _buildCategoryItem(context, 'Drinks', 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2Fdrinks.jpg?alt=media&token=2393ae84-2383-4a3b-b659-e377fb89143b'),
                   ],
                 ),
               ),
-              SizedBox(height: 20),
             ],
           ),
         ),
       ),
       bottomNavigationBar: BottomNavigationBar(
-        items: <BottomNavigationBarItem>[
+        items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.home,
-              color: _selectedIndex == 0 ? Colors.blue : Colors.grey,
-            ),
+            icon: Icon(Icons.home),
             label: 'Home',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.menu_book,
-              color: _selectedIndex == 1 ? Colors.blue : Colors.grey,
-            ),
+            icon: Icon(Icons.restaurant_menu),
             label: 'Menu',
           ),
           BottomNavigationBarItem(
-            icon: Icon(
-              Icons.add,
-              color: _selectedIndex == 2 ? Colors.blue : Colors.grey,
-            ),
-            label: 'Add',
-          ),
-          BottomNavigationBarItem(
-            icon: Icon(
-              Icons.person,
-              color: _selectedIndex == 3 ? Colors.blue : Colors.grey,
-            ),
+            icon: Icon(Icons.person),
             label: 'Profile',
           ),
         ],
         currentIndex: _selectedIndex,
-        selectedItemColor: Colors.blue,
-        unselectedItemColor: Colors.grey,
-        backgroundColor: Colors.white,
-        type: BottomNavigationBarType.fixed,
         onTap: _onItemTapped,
-        elevation: 8.0,
       ),
     );
   }
 
-  Widget _buildCategoryCard(String imagePath, String title) {
-    return Container(
-      margin: EdgeInsets.only(right: 10.0),
-      child: Column(
-        children: [
-          ClipRRect(
-            borderRadius: BorderRadius.circular(10),
-            child: Image.asset(
-              imagePath,
-              height: 120,
-              width: 120,
-              fit: BoxFit.cover,
-            ),
+  Widget _buildCategoryItem(BuildContext context, String category, String imageUrl) {
+    return GestureDetector(
+      onTap: () {
+        Navigator.push(
+          context,
+          MaterialPageRoute(
+            builder: (context) => RecipeList(),
           ),
-          SizedBox(height: 8.0),
-          Text(
-            title,
-            style: TextStyle(
-              color: Colors.black,
-              fontSize: 16,
-              fontWeight: FontWeight.w500,
+        );
+      },
+      child: Container(
+        width: MediaQuery.of(context).size.width,
+        height: 200.0,
+        child: Stack(
+          fit: StackFit.expand,
+          children: [
+            ClipRRect(
+              borderRadius: BorderRadius.circular(8.0),
+              child: Image.network(
+                imageUrl,
+                fit: BoxFit.cover,
+              ),
             ),
-          ),
-        ],
+            Positioned(
+              bottom: 0,
+              left: 0,
+              right: 0,
+              child: Container(
+                color: Colors.black54,
+                padding: EdgeInsets.all(12.0),
+                child: Text(
+                  category,
+                  style: TextStyle(
+                    fontSize: 16.0,
+                    fontWeight: FontWeight.bold,
+                    color: Colors.white,
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
     );
   }

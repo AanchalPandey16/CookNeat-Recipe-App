@@ -303,9 +303,11 @@ class _ProfileState extends State<Profile> {
     );
   }
 
+  
+
   @override
   void dispose() {
-    // Cancel any ongoing tasks if necessary
+    
     super.dispose();
   }
 
