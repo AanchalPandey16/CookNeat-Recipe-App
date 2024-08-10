@@ -1,5 +1,6 @@
 import 'package:cook_n_eat/screens/bottomnav.dart';
 import 'package:cook_n_eat/screens/forgotpass.dart';
+import 'package:cook_n_eat/screens/onboarding/onboarding_view.dart';
 import 'package:cook_n_eat/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
@@ -84,7 +85,7 @@ class _LoginState extends State<Login> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.orange.shade900, Colors.white],
+            colors: [Colors.orange.shade600, Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -116,7 +117,7 @@ class _LoginState extends State<Login> {
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Colors.orange.shade900,
+                      color: Colors.orange.shade600,
                     ),
                   ),
                   SizedBox(height: 30),
@@ -129,7 +130,7 @@ class _LoginState extends State<Login> {
                           decoration: InputDecoration(
                             labelText: 'Email',
                             prefixIcon: Icon(Icons.email,
-                                color: Colors.orange.shade900),
+                                color: Colors.orange.shade600),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -145,13 +146,13 @@ class _LoginState extends State<Login> {
                           decoration: InputDecoration(
                             labelText: 'Password',
                             prefixIcon:
-                                Icon(Icons.lock, color: Colors.orange.shade900),
+                                Icon(Icons.lock, color: Colors.orange.shade600),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureText
                                     ? Icons.visibility
                                     : Icons.visibility_off,
-                                color: Colors.orange.shade900,
+                                color: Colors.orange.shade600,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -181,7 +182,7 @@ class _LoginState extends State<Login> {
                             child: Text(
                               'Forgot Password?',
                               style: TextStyle(
-                                color: Colors.orange.shade900,
+                                color: Colors.orange.shade600,
                                 fontWeight: FontWeight.bold,
                               ),
                             ),
@@ -191,7 +192,7 @@ class _LoginState extends State<Login> {
                         ElevatedButton(
                           onPressed: _login,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade900,
+                            backgroundColor: Colors.orange.shade600,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -226,7 +227,7 @@ class _LoginState extends State<Login> {
                               child: Text(
                                 'Sign Up',
                                 style: TextStyle(
-                                  color: Colors.orange.shade900,
+                                  color: Colors.orange.shade600,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -243,8 +244,9 @@ class _LoginState extends State<Login> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        backgroundColor: Colors.orange.shade900,
+        onPressed: () => Navigator.push(context,
+         MaterialPageRoute(builder: (context)=> OnboardingView())),
+        backgroundColor: Colors.orange.shade600,
         child: Icon(Icons.arrow_back, color: Colors.white),
       ),
     );

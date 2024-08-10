@@ -1,6 +1,6 @@
 import 'package:cook_n_eat/screens/bottomnav.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
-import 'package:cook_n_eat/screens/scroll.dart';
+import 'package:cook_n_eat/screens/onboarding/onboarding_view.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
 
@@ -39,7 +39,7 @@ Timer(const Duration(seconds: 2), () {
     Timer(const Duration(seconds: 3), () {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const Register())
+        MaterialPageRoute(builder: (context) => const OnboardingView())
         );
     });
   }

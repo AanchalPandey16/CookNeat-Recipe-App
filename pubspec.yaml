@@ -44,6 +44,9 @@ dependencies:
   firebase_dynamic_links:
   path_provider: 
   flutter_launcher_icons: 
+  smooth_page_indicator: 
+
+
  
     
 
@@ -55,6 +58,8 @@ dependencies:
   badges: ^3.1.2
   get: ^4.6.6
   curved_navigation_bar: ^1.0.6
+
+ 
   
   
   

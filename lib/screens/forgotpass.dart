@@ -123,7 +123,7 @@ class _ForgotpassState extends State<Forgotpass> {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.orange.shade900, Colors.orange.shade100],
+            colors: [Colors.orange.shade600, Colors.orange.shade100],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -172,7 +172,7 @@ class _ForgotpassState extends State<Forgotpass> {
                           textAlign: TextAlign.center,
                           style: TextStyle(
                             fontSize: 16,
-                            color: Colors.orange.shade900,
+                            color: Colors.orange.shade600,
                           ),
                         ),
                         SizedBox(height: 20),
@@ -185,7 +185,7 @@ class _ForgotpassState extends State<Forgotpass> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.orange.shade900),
+                            prefixIcon: Icon(Icons.email, color: Colors.orange.shade600),
                             filled: true,
                             fillColor: Colors.white,
                           ),
@@ -195,7 +195,7 @@ class _ForgotpassState extends State<Forgotpass> {
                         ElevatedButton(
                           onPressed: passwordReset,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade900,
+                            backgroundColor: Colors.orange.shade600,
                             foregroundColor: Colors.white,
                             padding: EdgeInsets.symmetric(vertical: 15, horizontal: 85),
                             shape: RoundedRectangleBorder(

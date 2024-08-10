@@ -3,7 +3,6 @@ import 'package:cook_n_eat/screens/bottomnav.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/menu.dart';
 import 'package:cook_n_eat/screens/profilepage.dart';
-import 'package:cook_n_eat/screens/scroll.dart';
 import 'package:cook_n_eat/screens/splashscreen.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_core/firebase_core.dart';

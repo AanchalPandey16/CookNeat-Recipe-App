@@ -1,3 +1,4 @@
+import 'package:cook_n_eat/screens/onboarding/onboarding_view.dart';
 import 'package:cook_n_eat/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
@@ -90,7 +91,7 @@ Future<void> _register() async {
       body: Container(
         decoration: BoxDecoration(
           gradient: LinearGradient(
-            colors: [Colors.orange.shade900, Colors.white],
+            colors: [Colors.orange.shade600, Colors.white],
             begin: Alignment.topCenter,
             end: Alignment.bottomCenter,
           ),
@@ -122,7 +123,7 @@ Future<void> _register() async {
                     style: TextStyle(
                       fontSize: 30,
                       fontWeight: FontWeight.bold,
-                      color: Colors.orange.shade900,
+                      color: Colors.orange.shade600,
                     ),
                   ),
                   SizedBox(height: 30),
@@ -134,7 +135,7 @@ Future<void> _register() async {
                           controller: _nameController,
                           decoration: InputDecoration(
                             labelText: 'Name',
-                            prefixIcon: Icon(Icons.person, color: Colors.orange.shade900),
+                            prefixIcon: Icon(Icons.person, color: Colors.orange.shade600),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -147,7 +148,7 @@ Future<void> _register() async {
                           controller: _emailController,
                           decoration: InputDecoration(
                             labelText: 'Email',
-                            prefixIcon: Icon(Icons.email, color: Colors.orange.shade900),
+                            prefixIcon: Icon(Icons.email, color: Colors.orange.shade600),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -161,11 +162,11 @@ Future<void> _register() async {
                           controller: _passwordController,
                           decoration: InputDecoration(
                             labelText: 'Password',
-                            prefixIcon: Icon(Icons.lock, color: Colors.orange.shade900),
+                            prefixIcon: Icon(Icons.lock, color: Colors.orange.shade600),
                             suffixIcon: IconButton(
                               icon: Icon(
                                 _obscureText ? Icons.visibility : Icons.visibility_off,
-                                color: Colors.orange.shade900,
+                                color: Colors.orange.shade600,
                               ),
                               onPressed: () {
                                 setState(() {
@@ -186,7 +187,7 @@ Future<void> _register() async {
                           controller: _confirmPasswordController,
                           decoration: InputDecoration(
                             labelText: 'Confirm Password',
-                            prefixIcon: Icon(Icons.lock, color: Colors.orange.shade900),
+                            prefixIcon: Icon(Icons.lock, color: Colors.orange.shade600),
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -199,7 +200,7 @@ Future<void> _register() async {
                         ElevatedButton(
                           onPressed: _register,
                           style: ElevatedButton.styleFrom(
-                            backgroundColor: Colors.orange.shade900,
+                            backgroundColor: Colors.orange.shade600,
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(10),
                             ),
@@ -233,7 +234,7 @@ Future<void> _register() async {
                               child: Text(
                                 'Login',
                                 style: TextStyle(
-                                  color: Colors.orange.shade900,
+                                  color: Colors.orange.shade600,
                                   fontWeight: FontWeight.bold,
                                 ),
                               ),
@@ -250,8 +251,9 @@ Future<void> _register() async {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.pop(context),
-        backgroundColor: Colors.orange.shade900,
+        onPressed: () => Navigator.push(context,
+        MaterialPageRoute(builder: (context) => OnboardingView())),
+        backgroundColor: Colors.orange.shade600,
         child: Icon(Icons.arrow_back, color: Colors.white),
       ),
     );
