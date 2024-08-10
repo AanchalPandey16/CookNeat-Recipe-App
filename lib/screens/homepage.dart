@@ -24,7 +24,7 @@ class _HomepageState extends State<Homepage> {
   final List<String> names = [
     'Kadhai Paneer',
     'Butter Naan',
-    'Bundi Raita',
+    'Boondi Raita',
   ];
 
   Future<void> _fetchRecipe(String name) async {
@@ -42,7 +42,8 @@ class _HomepageState extends State<Homepage> {
             builder: (context) => HpRecipes(
               imageUrl: recipeData['imageUrl'],
               ingredients: recipeData['ingredients'],
-              steps: recipeData['steps'],
+              steps: recipeData['steps'], 
+              dishName: recipeData['name'],
             ),
           ),
         );
@@ -83,9 +84,9 @@ class _HomepageState extends State<Homepage> {
                   ),
                   SizedBox(width: 10),
                   ClipRRect(
-                    borderRadius: BorderRadius.circular(10),
+                    borderRadius: BorderRadius.circular(5),
                     child: Image.asset(
-                      "assets/logo.png",
+                      "assets/recipe.png",
                       height: 40,
                       width: 40,
                       fit: BoxFit.cover,

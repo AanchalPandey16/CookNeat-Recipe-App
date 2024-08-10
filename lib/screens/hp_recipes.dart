@@ -4,12 +4,14 @@ class HpRecipes extends StatelessWidget {
   final String imageUrl;
   final String ingredients;
   final String steps;
+  final String dishName; // New property for the dish name
 
   const HpRecipes({
     Key? key,
     required this.imageUrl,
     required this.ingredients,
     required this.steps,
+    required this.dishName, // Initialize the dish name
   }) : super(key: key);
 
   List<String> formatText(String text, bool isSteps) {
@@ -26,7 +28,6 @@ class HpRecipes extends StatelessWidget {
       body: Stack(
         children: [
           Container(
-            // Lighter gradient background
             decoration: BoxDecoration(
               gradient: LinearGradient(
                 colors: [Colors.orange.shade300, Colors.orange.shade200],
@@ -39,7 +40,7 @@ class HpRecipes extends StatelessWidget {
             children: [
               AppBar(
                 title: Text(
-                  'Recipe Details',
+                  dishName, 
                   style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
                 ),
                 backgroundColor: Colors.transparent,
@@ -47,7 +48,7 @@ class HpRecipes extends StatelessWidget {
                   IconButton(
                     icon: Icon(Icons.share, color: Colors.white),
                     onPressed: () {
-                      // Share functionality here
+                      
                     },
                   ),
                 ],

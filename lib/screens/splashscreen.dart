@@ -28,7 +28,7 @@ class _SplashState extends State<Splash> {
 prefs = await SharedPreferences.getInstance();
   if(prefs.getBool('isLogin')==true)
   {
-Timer(const Duration(seconds: 3), () {
+Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => const Bottomnav())

@@ -317,8 +317,8 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text('Profile', style: TextStyle(color: Colors.black)),
-        backgroundColor: Colors.white,
+        title: Text('Profile', style: TextStyle(color: Colors.orange.shade600)),
+       
         elevation: 1,
         iconTheme: IconThemeData(color: Colors.black),
         leading: IconButton(
@@ -404,14 +404,14 @@ class _ProfileState extends State<Profile> {
                   ),
                 ],
               ),
-            ),
+            ),         
             Divider(
               thickness: 1.0,
               color: Colors.grey,
               indent: 16.0,
               endIndent: 16.0,
             ),
-            // Lower Box: Navigation Buttons
+         
             Container(
               padding: const EdgeInsets.all(16.0),
               child: Column(
@@ -433,6 +433,7 @@ class _ProfileState extends State<Profile> {
                         MaterialPageRoute(builder: (context) => AddRecipe()),
                       );
                     },
+                    
                   ),
                 ],
               ),
