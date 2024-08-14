@@ -289,7 +289,7 @@ class _ProfileState extends State<Profile> {
                   prefs.setBool('isLogin', false);
                   await _auth.signOut();
                   Navigator.pop(context);
-                  Navigator.push(context,
+                  Navigator.pushReplacement(context,
                       MaterialPageRoute(builder: (context) => Login()));
                 },
               ),

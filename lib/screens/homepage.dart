@@ -74,7 +74,7 @@ class _HomepageState extends State<Homepage> {
                 children: [
                   Expanded(
                     child: Text(
-                      "Hello,\nWant to make your\nfavourite meal?",
+                      "Hello Foodie,\nWant to make your\nfavourite meal?",
                       style: TextStyle(
                         color: Colors.black,
                         fontSize: 25.0,
