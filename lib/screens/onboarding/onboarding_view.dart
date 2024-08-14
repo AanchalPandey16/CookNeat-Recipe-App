@@ -35,7 +35,7 @@ class _OnboardingViewState extends State<OnboardingView> {
               controller: pageController,
               count: controller.items.length,
               onDotClicked: (index) => pageController.animateToPage(index,
-              duration: Duration(milliseconds: 500), curve: Curves.easeInOut),
+              duration: Duration(milliseconds: 400), curve: Curves.easeInOut),
               effect: WormEffect(
                 dotHeight: 12,
                 dotWidth: 12,
