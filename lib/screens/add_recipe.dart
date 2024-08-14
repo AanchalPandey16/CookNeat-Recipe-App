@@ -56,13 +56,11 @@ class _AddRecipeState extends State<AddRecipe> {
             "ingredients": ingredientsController.text,
             "steps": stepsController.text,
             "image": downloadUrl,
-            "userId": userId, 
+            "userId": userId,
           };
 
-          // Save recipe under user's ID in Firestore
           await DatabaseMethods().addRecipe(addRecipe);
 
-          // Clear fields and reset state
           recipeNameController.clear();
           ingredientsController.clear();
           stepsController.clear();
@@ -93,29 +91,15 @@ class _AddRecipeState extends State<AddRecipe> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: Container(
-          decoration: BoxDecoration(
-            gradient: LinearGradient(
-              colors: [Colors.orange[200]!, Colors.orange[400]!],
-              begin: Alignment.topLeft,
-              end: Alignment.bottomRight,
-            ),
-          ),
+
           child: AppBar(
-            title: Text('Add Recipe', style: TextStyle(color: Colors.black, fontWeight: FontWeight.bold)),
+            title: Text('Add Recipe', style: TextStyle(color: const Color.fromARGB(255, 13, 13, 13), fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
-            elevation: 0,
-            iconTheme: IconThemeData(color: Colors.black),
+            iconTheme: IconThemeData(color: const Color.fromARGB(255, 13, 13, 13)),
           ),
         ),
       ),
       body: Container(
-        decoration: BoxDecoration(
-          gradient: LinearGradient(
-            colors: [Colors.orange[100]!, Colors.orange[300]!],
-            begin: Alignment.topLeft,
-            end: Alignment.bottomRight,
-          ),
-        ),
         child: SingleChildScrollView(
           child: Padding(
             padding: const EdgeInsets.all(16.0),
@@ -132,6 +116,13 @@ class _AddRecipeState extends State<AddRecipe> {
                         color: Colors.grey[200],
                         borderRadius: BorderRadius.circular(12.0),
                         border: Border.all(color: Colors.grey[400]!),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black26,
+                            blurRadius: 8.0,
+                            offset: Offset(0, 4),
+                          ),
+                        ],
                       ),
                       child: selectedImage == null
                           ? Icon(Icons.camera_alt_outlined, size: 50, color: Colors.grey)
@@ -152,7 +143,6 @@ class _AddRecipeState extends State<AddRecipe> {
                   controller: recipeNameController,
                   label: 'Recipe Name',
                   hintText: 'Enter the name of your dish',
-                  minLines: 1,
                 ),
                 SizedBox(height: 20.0),
                 _buildTextField(
@@ -172,13 +162,13 @@ class _AddRecipeState extends State<AddRecipe> {
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white,
-                      backgroundColor: Color.fromARGB(255, 231, 105, 67),
+                      foregroundColor: Colors.white, backgroundColor: Colors.orange[00],
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 160.0, vertical: 15.0),
-                      elevation: 5.0,
+                      padding: EdgeInsets.symmetric(horizontal: 160, vertical: 12),
+                      elevation: 8.0,
+                      shadowColor: Colors.black.withOpacity(0.5),
                     ),
                     onPressed: uploadItem,
                     child: Text('Save', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
@@ -212,6 +202,13 @@ class _AddRecipeState extends State<AddRecipe> {
             color: Colors.white,
             border: Border.all(color: Colors.grey[300]!),
             borderRadius: BorderRadius.circular(12.0),
+            boxShadow: [
+              BoxShadow(
+                color: Colors.black12,
+                blurRadius: 6.0,
+                offset: Offset(0, 2),
+              ),
+            ],
           ),
           child: TextField(
             controller: controller,
@@ -221,7 +218,7 @@ class _AddRecipeState extends State<AddRecipe> {
               hintStyle: TextStyle(color: Colors.grey[600]),
             ),
             minLines: minLines,
-            maxLines: null, // Allows the field to expand vertically
+            maxLines: null, 
           ),
         ),
       ],

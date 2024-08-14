@@ -1,5 +1,6 @@
 import 'dart:typed_data';
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -8,6 +9,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'add_recipe.dart';
 import 'login.dart';
 import 'recipedetail.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 class Profile extends StatefulWidget {
   const Profile({super.key});
@@ -174,77 +176,50 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  void _showUsernameDialog() {
-    TextEditingController _controller = TextEditingController(text: _username);
+  void _showEditProfileDialog() {
+    TextEditingController _usernameController =
+        TextEditingController(text: _username);
+    TextEditingController _bioController = TextEditingController(text: _bio);
 
     showDialog(
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Change Username'),
-          content: TextField(
-            controller: _controller,
-            decoration: InputDecoration(
-              labelText: 'Username',
-            ),
+          title: Text('Edit Profile'),
+          content: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              TextField(
+                controller: _usernameController,
+                decoration: InputDecoration(
+                  labelText: 'Username',
+                ),
+              ),
+              SizedBox(height: 16.0),
+              TextField(
+                controller: _bioController,
+                decoration: InputDecoration(
+                  labelText: 'Bio',
+                ),
+              ),
+            ],
           ),
           actions: [
             TextButton(
               onPressed: () {
-                if (_controller.text.isNotEmpty) {
+                if (_usernameController.text.isNotEmpty &&
+                    _bioController.text.isNotEmpty) {
                   if (mounted) {
                     setState(() {
-                      _username = _controller.text;
+                      _username = _usernameController.text;
+                      _bio = _bioController.text;
                     });
                   }
                   Navigator.pop(context);
+                  _saveProfile();
                 } else {
                   ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Username cannot be empty')));
-                }
-              },
-              child: Text('Save'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
-            ),
-          ],
-        );
-      },
-    );
-  }
-
-  void _showBioDialog() {
-    TextEditingController _controller = TextEditingController(text: _bio);
-
-    showDialog(
-      context: context,
-      builder: (BuildContext context) {
-        return AlertDialog(
-          title: Text('Change Bio'),
-          content: TextField(
-            controller: _controller,
-            decoration: InputDecoration(
-              labelText: 'Bio',
-            ),
-            maxLines: 3,
-          ),
-          actions: [
-            TextButton(
-              onPressed: () {
-                if (_controller.text.isNotEmpty) {
-                  if (mounted) {
-                    setState(() {
-                      _bio = _controller.text;
-                    });
-                  }
-                  Navigator.pop(context);
-                } else {
-                  ScaffoldMessenger.of(context).showSnackBar(
-                      SnackBar(content: Text('Bio cannot be empty')));
+                      SnackBar(content: Text('Fields cannot be empty')));
                 }
               },
               child: Text('Save'),
@@ -293,20 +268,26 @@ class _ProfileState extends State<Profile> {
                       MaterialPageRoute(builder: (context) => Login()));
                 },
               ),
-              ListTile(
-                leading: Icon(Icons.save),
-                title: Text('Save Profile'),
-                onTap: () {
-                  Navigator.pop(context);
-                  saveProfile();
-                },
-              ),
+              if (!_isProfileSaved)
+                ListTile(
+                  leading: Icon(Icons.save),
+                  title: Text('Save Profile'),
+                  onTap: () {
+                    Navigator.pop(context);
+                    saveProfile();
+                    setState(() {
+                      _isProfileSaved = true;
+                    });
+                  },
+                ),
             ],
           ),
         );
       },
     );
   }
+
+  bool _isProfileSaved = false;
 
   @override
   void dispose() {
@@ -316,131 +297,139 @@ class _ProfileState extends State<Profile> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text('Profile', style: TextStyle(color: Colors.orange.shade600)),
-       
-        elevation: 1,
-        iconTheme: IconThemeData(color: Colors.black),
-        leading: IconButton(
-          icon: Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () {
-            Navigator.pop(context);
-          },
-        ),
-        actions: [
-          IconButton(
-            icon: Icon(Icons.settings, color: Colors.black),
-            onPressed: _showSettingsDialog,
-          ),
-        ],
-      ),
-      body: SingleChildScrollView(
-        child: Column(
-          children: [
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Row(
-                children: [
-                  GestureDetector(
-                    onTap: _showOptionsDialog,
-                    child: CircleAvatar(
-                      radius: 70,
-                      backgroundColor: Colors.grey[200],
-                      child: _image != null
-                          ? ClipOval(
-                              child: Image.memory(
-                                _image!,
-                                fit: BoxFit.cover,
-                                width: 140,
-                                height: 140,
-                              ),
-                            )
-                          : _profileImageUrl.isNotEmpty
-                              ? ClipOval(
-                                  child: Image.network(
-                                    _profileImageUrl,
-                                    fit: BoxFit.cover,
-                                    width: 140,
-                                    height: 140,
-                                  ),
-                                )
-                              : Icon(
-                                  Icons.camera_alt,
-                                  size: 50,
-                                  color: Colors.grey[700],
-                                ),
-                    ),
-                  ),
-                  SizedBox(width: 16.0),
-                  Expanded(
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        GestureDetector(
-                          onTap: _showUsernameDialog,
-                          child: Text(
-                            _username.isNotEmpty
-                                ? _username
-                                : 'Set your username',
-                            style: TextStyle(
-                              fontSize: 24.0,
-                              fontWeight: FontWeight.bold,
-                            ),
-                          ),
-                        ),
-                        SizedBox(height: 8.0),
-                        GestureDetector(
-                          onTap: _showBioDialog,
-                          child: Text(
-                            _bio.isNotEmpty ? _bio : 'Set your bio',
-                            style: TextStyle(
-                              fontSize: 16.0,
-                              color: Colors.grey[600],
-                            ),
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ],
+        appBar: AppBar(
+          title: Text(
+            'Profile',
+            style: GoogleFonts.satisfy(
+              textStyle: TextStyle(
+                color: const Color.fromARGB(255, 11, 11, 11),
+                fontWeight: FontWeight.bold,
               ),
-            ),         
-            Divider(
-              thickness: 1.0,
-              color: Colors.grey,
-              indent: 16.0,
-              endIndent: 16.0,
             ),
-         
-            Container(
-              padding: const EdgeInsets.all(16.0),
-              child: Column(
-                children: [
-                  ListTile(
-                    leading: Icon(Icons.book, color: Colors.black),
-                    title: Text('My Recipes',
-                        style: TextStyle(color: Colors.black)),
-                    onTap: _navigateToMyRecipes,
-                  ),
-                  Divider(),
-                  ListTile(
-                    leading: Icon(Icons.add_circle, color: Colors.black),
-                    title: Text('Add Recipe',
-                        style: TextStyle(color: Colors.black)),
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(builder: (context) => AddRecipe()),
-                      );
-                    },
-                    
-                  ),
-                ],
-              ),
+          ),
+          centerTitle: true,
+          iconTheme: IconThemeData(color: Colors.black),
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back, color: Colors.black),
+            onPressed: () {
+              Navigator.pop(context);
+            },
+          ),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings, color: Colors.black),
+              onPressed: _showSettingsDialog,
             ),
           ],
         ),
-      ),
-    );
+        body: SingleChildScrollView(
+            child: Column(children: [
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Row(
+              children: [
+                GestureDetector(
+                  onTap: _showOptionsDialog,
+                  child: CircleAvatar(
+                    radius: 70,
+                    backgroundColor: Colors.grey[200],
+                    child: _image != null
+                        ? ClipOval(
+                            child: Image.memory(
+                              _image!,
+                              fit: BoxFit.cover,
+                              width: 140,
+                              height: 140,
+                            ),
+                          )
+                        : _profileImageUrl.isNotEmpty
+                            ? ClipOval(
+                                child: Image.network(
+                                  _profileImageUrl,
+                                  fit: BoxFit.cover,
+                                  width: 140,
+                                  height: 140,
+                                ),
+                              )
+                            : Icon(
+                                Icons.person,
+                                size: 70,
+                                color: Colors.grey,
+                              ),
+                  ),
+                ),
+                SizedBox(width: 20),
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(_username.isNotEmpty ? _username : 'Username',
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          )),
+                      SizedBox(height: 5),
+                      Text(_bio.isNotEmpty ? _bio : 'Bio',
+                          style: TextStyle(
+                            fontSize: 15,
+                          )),
+                    ],
+                  ),
+                ),
+              ],
+            ),
+          ),
+          OutlinedButton(
+            onPressed: _showEditProfileDialog,
+            style: OutlinedButton.styleFrom(
+              padding: EdgeInsets.symmetric(horizontal: 145, vertical: 2),
+              textStyle: TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.bold,
+                color: Colors.black,
+              ),
+              side: BorderSide(
+                color: Colors.black,
+                width: 1.1,
+              ),
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(10),
+              ),
+              backgroundColor: Colors.transparent,
+            ),
+            child: Text('Edit Profile'),
+          ),
+          Divider(
+            thickness: 1.0,
+            color: Colors.grey,
+            indent: 16.0,
+            endIndent: 16.0,
+          ),
+          Container(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              children: [
+                ListTile(
+                  leading: Icon(Icons.book, color: Colors.black),
+                  title:
+                      Text('My Recipes', style: TextStyle(color: Colors.black)),
+                  onTap: _navigateToMyRecipes,
+                ),
+                Divider(),
+                ListTile(
+                  leading: Icon(Icons.add_circle, color: Colors.black),
+                  title:
+                      Text('Add Recipe', style: TextStyle(color: Colors.black)),
+                  onTap: () {
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(builder: (context) => AddRecipe()),
+                    );
+                  },
+                ),
+              ],
+            ),
+          ),
+        ])));
   }
 }

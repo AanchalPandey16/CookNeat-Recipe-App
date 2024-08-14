@@ -10,7 +10,7 @@ class RecipeDetailPage extends StatelessWidget {
 
   const RecipeDetailPage({Key? key, required this.recipeName}) : super(key: key);
 
-  // Download image from URL and save it to a temporary file
+  
   Future<String?> _downloadImage(String imageUrl) async {
     try {
       final response = await http.get(Uri.parse(imageUrl));
@@ -49,7 +49,7 @@ class RecipeDetailPage extends StatelessWidget {
 
       final imageUrl = recipeData['imageUrl'] ?? '';
  
-      // Create a deep link to the recipe in the app
+      
       final recipeLink = 'myapp://recipes/$recipeName';
 
       String? imagePath;
@@ -93,7 +93,7 @@ class RecipeDetailPage extends StatelessWidget {
           Container(
             decoration: BoxDecoration(
               gradient: LinearGradient(
-                colors: [Colors.orange.shade300, Colors.orange.shade200],
+                colors: [Colors.white, Colors.white],
                 begin: Alignment.topLeft,
                 end: Alignment.bottomRight,
               ),
@@ -158,8 +158,7 @@ class RecipeDetailPage extends StatelessWidget {
                                       ),
                                     ],
                                   ),
-                                  child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                  child: ClipRRect( 
                                     child: Image.network(
                                       imageUrl,
                                       fit: BoxFit.cover,
@@ -220,7 +219,7 @@ class RecipeDetailPage extends StatelessWidget {
                           Container(
                             padding: EdgeInsets.all(16.0),
                             decoration: BoxDecoration(
-                              color: const Color(0xFFF5F5F5), // Off-white color
+                              color: const Color(0xFFF5F5F5), 
                               borderRadius: BorderRadius.circular(16.0),
                               boxShadow: [
                                 BoxShadow(

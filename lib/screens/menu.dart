@@ -1,7 +1,8 @@
 import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/profilepage.dart';
 import 'package:flutter/material.dart';
-import 'package:cook_n_eat/screens/recipelist.dart'; // Ensure this path is correct
+import 'package:cook_n_eat/screens/recipelist.dart';
+import 'package:google_fonts/google_fonts.dart'; // Ensure this path is correct
 
 class Menu extends StatefulWidget {
   const Menu({super.key});
@@ -61,11 +62,16 @@ class _MenuState extends State<Menu> {
           title: Row(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              Text('Menu'),
+              Text('Menu', style: GoogleFonts.satisfy(
+                textStyle: TextStyle(
+                  fontWeight: FontWeight.bold,
+                )
+              )
+              ,),
             ],
           ),
           centerTitle: true,
-          elevation: 4.0,
+         
 
         ),
 

@@ -12,6 +12,7 @@ class _RecipeListState extends State<RecipeList> {
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
   String _searchQuery = '';
+  bool _isAdding = false; // To track if adding a recipe is in progress
 
   void _toggleSearch() {
     setState(() {
@@ -21,6 +22,33 @@ class _RecipeListState extends State<RecipeList> {
         _searchQuery = '';
       }
     });
+  }
+
+  Future<void> _addRecipe() async {
+    if (_isAdding) return; // Prevent multiple clicks
+
+    setState(() {
+      _isAdding = true; // Set to true to disable button
+    });
+
+    try {
+      // Simulate a long process
+      await Future.delayed(Duration(seconds: 2));
+
+      // Add your recipe adding logic here
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Recipe added successfully')),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to add recipe')),
+      );
+    } finally {
+      setState(() {
+        _isAdding = false; // Reset to allow further actions
+      });
+    }
   }
 
   @override
@@ -68,6 +96,7 @@ class _RecipeListState extends State<RecipeList> {
                   icon: Icon(_isSearching ? Icons.close : Icons.search),
                   onPressed: _toggleSearch,
                 ),
+                
               ],
             ),
             Expanded(
@@ -445,21 +474,38 @@ class _RecipeDetailState extends State<RecipeDetail> {
                     Navigator.pop(context);
                   },
                 ),
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.save),
-                    onPressed: _editRecipe,
-                  ),
-                  IconButton(
-                    icon: Icon(Icons.delete),
-                    onPressed: () => _deleteRecipe(context),
-                  ),
-                ],
-              ),
-            ),
-          ],
+        actions: [
+          PopupMenuButton<String>(
+            icon: Icon(Icons.more_vert), 
+            onSelected: (String value) {
+              switch (value) {
+                case 'Save':
+                  _editRecipe();
+                  break;
+                case 'Delete':
+                  _deleteRecipe(context);
+                  break;
+              }
+            },
+            itemBuilder: (BuildContext context) {
+              return [
+                PopupMenuItem<String>(
+                  value: 'Save',
+                  child: Text('Save Recipe'),
+                ),
+                PopupMenuItem<String>(
+                  value: 'Delete',
+                  child: Text('Delete Recipe'),
+                ),
+              ];
+            },
+          ),
+        ],
         ),
       ),
+    ]
+    )
+    )
     );
   }
 }
