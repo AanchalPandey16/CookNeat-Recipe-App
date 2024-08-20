@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cook_n_eat/screens/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
 import 'package:image_picker/image_picker.dart';
@@ -312,7 +313,8 @@ class _ProfileState extends State<Profile> {
           leading: IconButton(
             icon: Icon(Icons.arrow_back, color: Colors.black),
             onPressed: () {
-              Navigator.pop(context);
+              Navigator.push(context, 
+              MaterialPageRoute(builder: (context)=> Menu()));
             },
           ),
           actions: [
@@ -382,7 +384,7 @@ class _ProfileState extends State<Profile> {
           OutlinedButton(
             onPressed: _showEditProfileDialog,
             style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 145, vertical: 2),
+              padding: EdgeInsets.symmetric(horizontal: 150, vertical: 2),
               textStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
@@ -430,6 +432,10 @@ class _ProfileState extends State<Profile> {
               ],
             ),
           ),
-        ])));
+        ]
+        )
+        )
+     
+        );
   }
 }

@@ -15,7 +15,7 @@ class RecipeListPage extends StatelessWidget {
         title: Text('$category Recipes'),
         leading: IconButton(
           icon: Icon(Icons.arrow_back),
-          onPressed: () => Navigator.pop(context), // Go back to the previous screen
+          onPressed: () => Navigator.pop(context), 
         ),
       ),
       body: SingleChildScrollView(

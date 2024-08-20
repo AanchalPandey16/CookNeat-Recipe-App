@@ -5,12 +5,44 @@ import 'package:http/http.dart' as http;
 import 'dart:io';
 import 'dart:async';
 
-class RecipeDetailPage extends StatelessWidget {
+class RecipeDetailPage extends StatefulWidget {
   final String recipeName;
 
   const RecipeDetailPage({Key? key, required this.recipeName}) : super(key: key);
 
-  
+  @override
+  _RecipeDetailPageState createState() => _RecipeDetailPageState();
+}
+
+class _RecipeDetailPageState extends State<RecipeDetailPage> {
+  bool showIngredients = true; // State variable to toggle between ingredients and steps
+  Map<String, dynamic>? recipeData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecipeData(); // Fetch recipe data on initialization
+  }
+
+  Future<void> _fetchRecipeData() async {
+    try {
+      DocumentSnapshot snapshot = await FirebaseFirestore.instance
+          .collection('recipe_detail')
+          .doc(widget.recipeName)
+          .get();
+
+      if (snapshot.exists) {
+        setState(() {
+          recipeData = snapshot.data() as Map<String, dynamic>?;
+        });
+      } else {
+        throw Exception('Recipe not found.');
+      }
+    } catch (e) {
+      print('Error fetching recipe data: $e');
+    }
+  }
+
   Future<String?> _downloadImage(String imageUrl) async {
     try {
       final response = await http.get(Uri.parse(imageUrl));
@@ -31,37 +63,20 @@ class RecipeDetailPage extends StatelessWidget {
 
   Future<void> _shareRecipe() async {
     try {
-      // Retrieve recipe data from Firestore
-      DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('recipe_detail')
-          .doc(recipeName)
-          .get();
-
-      if (!snapshot.exists) {
-        throw Exception('Recipe not found.');
-      }
-
-      final recipeData = snapshot.data() as Map<String, dynamic>?;
-
       if (recipeData == null) {
         throw Exception('Recipe data is null.');
       }
 
-      final imageUrl = recipeData['imageUrl'] ?? '';
- 
-      
-      final recipeLink = 'myapp://recipes/$recipeName';
+      final imageUrl = recipeData!['imageUrl'] ?? '';
+      final recipeLink = 'myapp://recipes/${widget.recipeName}';
 
       String? imagePath;
       if (imageUrl.isNotEmpty) {
         imagePath = await _downloadImage(imageUrl);
       }
 
-      // Prepare text to share
-      final shareText = 'Check out this recipe:\n\n'
-                        'Recipe Link: $recipeLink';
+      final shareText = 'Check out this recipe:\n\nRecipe Link: $recipeLink';
 
-      // Share image and text
       if (imagePath != null) {
         await Share.shareXFiles(
           [XFile(imagePath)],
@@ -75,12 +90,10 @@ class RecipeDetailPage extends StatelessWidget {
     }
   }
 
-  // Function to format ingredients
   String _formatIngredients(String ingredients) {
     return ingredients.split(',').map((ingredient) => ingredient.trim()).join('\n');
   }
 
-  // Function to format steps
   String _formatSteps(String steps) {
     return steps.split('.').map((step) => step.trim()).where((step) => step.isNotEmpty).join('.\n');
   }
@@ -90,169 +103,182 @@ class RecipeDetailPage extends StatelessWidget {
     return Scaffold(
       body: Stack(
         children: [
-          Container(
-            decoration: BoxDecoration(
-              gradient: LinearGradient(
-                colors: [Colors.white, Colors.white],
-                begin: Alignment.topLeft,
-                end: Alignment.bottomRight,
-              ),
-            ),
-          ),
           Column(
             children: [
-              AppBar(
-                title: Text(
-                  recipeName,
-                  style: TextStyle(fontSize: 20.0, fontWeight: FontWeight.bold),
-                ),
-                backgroundColor: Colors.transparent,
-                actions: [
-                  IconButton(
-                    icon: Icon(Icons.share, color: const Color.fromARGB(255, 16, 16, 16)),
-                    onPressed: _shareRecipe,
-                  ),
-                ],
-              ),
               Expanded(
-                child: SingleChildScrollView(
-                  padding: EdgeInsets.all(16.0),
-                  child: FutureBuilder<DocumentSnapshot>(
-                    future: FirebaseFirestore.instance
-                        .collection('recipe_detail')
-                        .doc(recipeName)
-                        .get(),
-                    builder: (context, snapshot) {
-                      if (snapshot.connectionState == ConnectionState.waiting) {
-                        return Center(child: CircularProgressIndicator());
-                      } else if (snapshot.hasError) {
-                        return Center(child: Text('Error: ${snapshot.error}'));
-                      } else if (!snapshot.hasData || !snapshot.data!.exists) {
-                        return Center(child: Text('Recipe not found.'));
-                      }
-
-                      final recipeData = snapshot.data!.data() as Map<String, dynamic>?;
-
-                      if (recipeData == null) {
-                        return Center(child: Text('Recipe data is null.'));
-                      }
-
-                      final imageUrl = recipeData['imageUrl'] ?? '';
-                      final ingredients = recipeData['ingredients'] ?? 'No ingredients available.';
-                      final steps = recipeData['steps'] ?? 'No steps available.';
-
-                      return Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        children: [
-                          imageUrl.isNotEmpty
-                              ? Container(
-                                  width: double.infinity,
-                                  height: 250.0,
-                                  decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        offset: Offset(0, 6),
-                                        blurRadius: 12.0,
+                child: recipeData == null
+                    ? Center(child: CircularProgressIndicator()) // Show loading only initially
+                    : SingleChildScrollView(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Stack(
+                              children: [
+                                recipeData!['imageUrl'].isNotEmpty
+                                    ? Container(
+                                        width: double.infinity,
+                                        height: 300.0,
+                                        decoration: BoxDecoration(
+                                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              offset: Offset(0, 6),
+                                              blurRadius: 12.0,
+                                            ),
+                                          ],
+                                        ),
+                                        child: ClipRRect(
+                                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                          child: Image.network(
+                                            recipeData!['imageUrl'],
+                                            fit: BoxFit.cover,
+                                          ),
+                                        ),
+                                      )
+                                    : Container(
+                                        height: 300.0,
+                                        decoration: BoxDecoration(
+                                          color: Colors.grey[300],
+                                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color: Colors.black26,
+                                              offset: Offset(0, 6),
+                                              blurRadius: 12.0,
+                                            ),
+                                          ],
+                                        ),
+                                        child: Center(
+                                          child: Icon(Icons.image, size: 60.0, color: Colors.grey[600]),
+                                        ),
+                                      ),
+                                Positioned(
+                                  top: 30.0,
+                                  left: 10.0,
+                                  child: IconButton(
+                                    icon: Icon(Icons.arrow_back, color: Colors.white),
+                                    onPressed: () {
+                                      Navigator.of(context).pop();
+                                    },
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.all(16.0),
+                              child: Column(
+                                crossAxisAlignment: CrossAxisAlignment.start,
+                                children: [
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Text(
+                                        widget.recipeName,
+                                        style: TextStyle(
+                                          fontSize: 28.0,
+                                          fontWeight: FontWeight.bold,
+                                        ),
+                                      ),
+                                      Row(
+                                        children: [
+                                          IconButton(
+                                            icon: Icon(Icons.favorite_border),
+                                            onPressed: () {
+                                              // Add functionality for adding to favorites
+                                            },
+                                          ),
+                                          IconButton(
+                                            icon: Icon(Icons.share),
+                                            onPressed: _shareRecipe,
+                                          ),
+                                        ],
                                       ),
                                     ],
                                   ),
-                                  child: ClipRRect( 
-                                    child: Image.network(
-                                      imageUrl,
-                                      fit: BoxFit.cover,
+                                  Divider(),
+                                  Row(
+                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    children: [
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            showIngredients = true;
+                                          });
+                                        },
+                                        child: Text(
+                                          'Ingredients',
+                                          style: TextStyle(
+                                            color: showIngredients ? Colors.orange.shade700 : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                      TextButton(
+                                        onPressed: () {
+                                          setState(() {
+                                            showIngredients = false;
+                                          });
+                                        },
+                                        child: Text(
+                                          'Steps',
+                                          style: TextStyle(
+                                            color: !showIngredients ? Colors.orange.shade700 : Colors.black,
+                                          ),
+                                        ),
+                                      ),
+                                    ],
+                                  ),
+                                  Divider(thickness: 1),
+                                  SizedBox(height: 16.0),
+                                  Container(
+                                    padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.white, // White background for a cleaner look
+                                      borderRadius: BorderRadius.circular(12.0), // Slightly smaller border radius
+                                      boxShadow: [
+                                        BoxShadow(
+                                          color: Colors.black12,
+                                          offset: Offset(0, 4),
+                                          blurRadius: 6.0,
+                                        ),
+                                      ],
+                                    ),
+                                    child: Column(
+                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      children: [
+                                        Text(
+                                          showIngredients ? 'Ingredients' : 'Steps',
+                                          style: TextStyle(
+                                            fontSize: 20.0, // Reduced font size
+                                            fontWeight: FontWeight.w600, // Slightly lighter than bold
+                                            color: Colors.orange.shade800, // A bit darker for better contrast
+                                          ),
+                                        ),
+                                        SizedBox(height: 8.0), // Reduced space between title and content
+                                        Divider(
+                                          color: Colors.orange.shade200, // Light orange divider for subtle separation
+                                          thickness: 1.5, // Slightly thicker divider
+                                        ),
+                                        SizedBox(height: 8.0), // Reduced space between divider and content
+                                        Text(
+                                          showIngredients
+                                              ? _formatIngredients(recipeData!['ingredients'] ?? 'No ingredients available.')
+                                              : _formatSteps(recipeData!['steps'] ?? 'No steps available.'),
+                                          style: TextStyle(
+                                            fontSize: 16.0, // Smaller font size for content
+                                            height: 1.5, // Line height for better readability
+                                            color: Colors.black87, // Darker color for better readability
+                                          ),
+                                        ),
+                                      ],
                                     ),
                                   ),
-                                )
-                              : Container(
-                                  height: 250.0,
-                                  decoration: BoxDecoration(
-                                    color: Colors.grey[300],
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
-                                    boxShadow: [
-                                      BoxShadow(
-                                        color: Colors.black26,
-                                        offset: Offset(0, 6),
-                                        blurRadius: 12.0,
-                                      ),
-                                    ],
-                                  ),
-                                  child: Center(
-                                    child: Icon(Icons.image, size: 60.0, color: Colors.grey[600]),
-                                  ),
-                                ),
-                          SizedBox(height: 16.0),
-                          Container(
-                            padding: EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5F5F5), // Off-white color
-                              borderRadius: BorderRadius.circular(16.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  offset: Offset(0, 4),
-                                  blurRadius: 8.0,
-                                ),
-                              ],
+                                ],
+                              ),
                             ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Ingredients',
-                                  style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange.shade700,
-                                  ),
-                                ),
-                                SizedBox(height: 12.0),
-                                Text(
-                                  _formatIngredients(ingredients),
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ],
-                            ),
-                          ),
-                          SizedBox(height: 16.0),
-                          Container(
-                            padding: EdgeInsets.all(16.0),
-                            decoration: BoxDecoration(
-                              color: const Color(0xFFF5F5F5), 
-                              borderRadius: BorderRadius.circular(16.0),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black12,
-                                  offset: Offset(0, 4),
-                                  blurRadius: 8.0,
-                                ),
-                              ],
-                            ),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  'Steps',
-                                  style: TextStyle(
-                                    fontSize: 24.0,
-                                    fontWeight: FontWeight.bold,
-                                    color: Colors.orange.shade700,
-                                  ),
-                                ),
-                                SizedBox(height: 12.0),
-                                Text(
-                                  _formatSteps(steps),
-                                  style: TextStyle(fontSize: 18.0),
-                                ),
-                              ],
-                            ),
-                          ),
-                        ],
-                      );
-                    },
-                  ),
-                ),
+                          ],
+                        ),
+                      ),
               ),
             ],
           ),

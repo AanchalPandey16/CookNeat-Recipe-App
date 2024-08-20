@@ -1,11 +1,5 @@
 import 'package:cook_n_eat/screens/recipedetail.dart';
-import 'package:curved_navigation_bar/curved_navigation_bar.dart';
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:cook_n_eat/screens/add_recipe.dart';
-import 'package:cook_n_eat/screens/menu.dart';
-import 'package:cook_n_eat/screens/profilepage.dart';
-import 'package:cook_n_eat/screens/hp_recipes.dart'; // Updated import
 
 class Homepage extends StatefulWidget {
   const Homepage({super.key});
@@ -15,48 +9,29 @@ class Homepage extends StatefulWidget {
 }
 
 class _HomepageState extends State<Homepage> {
-  final List<String> imagePaths = [
-    'assets/paneer.jpg',
-    'assets/naan.jpeg',
-    'assets/bundiraita.jpeg',
-  ];
+  final TextEditingController _searchController = TextEditingController();
+  String _selectedCategory = 'All'; // Default category
+  List<Map<String, dynamic>> _recipes = []; // Placeholder for recipes
 
-  final List<String> names = [
-    'Kadhai Paneer',
-    'Butter Naan',
-    'Boondi Raita',
-  ];
+  @override
+  void initState() {
+    super.initState();
+    _fetchRecipes(); // Fetch recipes for default category
+  }
 
-  Future<void> _fetchRecipe(String name) async {
-    try {
-      final recipeSnapshot = await FirebaseFirestore.instance
-          .collection('hp_recipe')
-          .where('name', isEqualTo: name)
-          .get();
+  void _onCategorySelected(String category) {
+    setState(() {
+      _selectedCategory = category;
+      _fetchRecipes();
+    });
+  }
 
-      if (recipeSnapshot.docs.isNotEmpty) {
-        final recipeData = recipeSnapshot.docs.first.data();
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => HpRecipes(
-              imageUrl: recipeData['imageUrl'],
-              ingredients: recipeData['ingredients'],
-              steps: recipeData['steps'], 
-              dishName: recipeData['name'],
-            ),
-          ),
-        );
-      } else {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Recipe not found')),
-        );
-      }
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Error fetching recipe: $e')),
-      );
-    }
+  void _fetchRecipes() {
+    // This is where you'd normally fetch recipes from a database.
+    // For this example, it's just an empty function.
+    setState(() {
+      _recipes = []; // Replace with actual data fetching logic
+    });
   }
 
   @override
@@ -64,11 +39,10 @@ class _HomepageState extends State<Homepage> {
     return Scaffold(
       body: SingleChildScrollView(
         child: Container(
-          padding: EdgeInsets.fromLTRB(16.0, 50.0, 16.0, 16.0), // Added top padding
+          padding: const EdgeInsets.fromLTRB(16.0, 50.0, 16.0, 16.0),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              
               Row(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -77,7 +51,7 @@ class _HomepageState extends State<Homepage> {
                       "Hello Foodie,\nWant to make your\nfavourite meal?",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 25.0,
+                        fontSize: 25,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -94,62 +68,139 @@ class _HomepageState extends State<Homepage> {
                   ),
                 ],
               ),
-              SizedBox(height: 30), 
+              const SizedBox(height: 20),
 
-             
-              Text(
-                "Featured Recipes",
-                style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
-              ),
-              SizedBox(height: 10),
+              // Search bar
               Container(
-                height: 200,
-                child: ListView(
-                  scrollDirection: Axis.horizontal,
-                  children: imagePaths.asMap().entries.map((entry) {
-                    int index = entry.key;
-                    String path = entry.value;
-                    String name = names[index];
-                    return GestureDetector(
-                      onTap: () {
-                        _fetchRecipe(name);
-                      },
-                      child: Container(
-                        margin: EdgeInsets.only(right: 10.0),
-                        child: ClipRRect(
-                          borderRadius: BorderRadius.circular(10),
-                          child: Stack(
-                            children: [
-                              Image.asset(
-                                path,
-                                height: 200,
-                                width: 300,
-                                fit: BoxFit.cover,
-                              ),
-                              Positioned(
-                                bottom: 10,
-                                left: 10,
-                                child: Text(
-                                  name,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 18,
-                                    fontWeight: FontWeight.bold,
-                                    backgroundColor: Colors.black54,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  }).toList(),
+                height: 80,
+                child: TextField(
+                  controller: _searchController,
+                  decoration: InputDecoration(
+                    hintText: 'Search recipes...',
+                    hintStyle: TextStyle(fontSize: 14),
+                    prefixIcon: Icon(Icons.search, color: Colors.orange[600]),
+                    border: OutlineInputBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    filled: true,
+                    fillColor: Colors.grey[200],
+                    contentPadding: EdgeInsets.symmetric(vertical: 10.0),
+                  ),
+                  onChanged: (query) {
+                    // Implement search functionality here if needed
+                  },
                 ),
               ),
-              SizedBox(height: 10),
+              Divider(
+                thickness: 2,
+              ),
+
+              const SizedBox(height: 10),
+
+              // Category buttons
+              SingleChildScrollView(
+                scrollDirection: Axis.horizontal,
+                child: Row(
+                  children: [
+                    _buildCategoryButton("All", Icons.all_inbox),
+                    _buildCategoryButton("Vegetarian", Icons.eco),
+                    _buildCategoryButton("Snack", Icons.fastfood),
+                    _buildCategoryButton("Chutneys", Icons.soup_kitchen),
+                    _buildCategoryButton("Desserts", Icons.cake),
+                    _buildCategoryButton("Beverages", Icons.local_drink),
+                  ],
+                ),
+              ),
+
+              const SizedBox(height: 10), 
+              Divider(
+                thickness: 2,
+              ),
+
+              const SizedBox(height: 20),
+
+              // Display recipes
+              _recipes.isEmpty
+                  ? Center(child: Text('No recipes found.'))
+                  : Column(
+                      children: _recipes.map((recipe) {
+                        return Card(
+                          margin: const EdgeInsets.symmetric(vertical: 5.0),
+                          child: ListTile(
+                            contentPadding: EdgeInsets.all(0),
+                            title: Stack(
+                              children: [
+                                Container(
+                                  width: double.infinity,
+                                  height: 200, // Height of the image container
+                                  child: recipe['imageUrl'] != null
+                                      ? Image.network(
+                                          recipe['imageUrl'],
+                                          fit: BoxFit.cover,
+                                        )
+                                      : Container(color: Colors.grey[300]), // Fallback color
+                                ),
+                                Positioned(
+                                  left: 0,
+                                  bottom: 0,
+                                  child: Container(
+                                    width: double.infinity, // Ensures it stretches to the full width
+                                    padding: EdgeInsets.all(8.0),
+                                    color: Colors.black.withOpacity(0.5), // Transparent line
+                                    child: Text(
+                                      recipe['name'] ?? 'No Name',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontWeight: FontWeight.bold,
+                                        fontSize: 16,
+                                      ),
+                                      overflow: TextOverflow.ellipsis, 
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RecipeDetail(recipe: recipe),
+                                ),
+                              );
+                            },
+                          ),
+                        );
+                      }).toList(),
+                    ),
             ],
           ),
+        ),
+      ),
+    );
+  }
+
+  Widget _buildCategoryButton(String title, IconData icon) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 5.0),
+      child: ElevatedButton.icon(
+        onPressed: () {
+          _onCategorySelected(title);
+        },
+        style: ElevatedButton.styleFrom(
+          backgroundColor: Colors.orange[100],
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
+          padding: EdgeInsets.symmetric(horizontal: 20, vertical: 10),
+        ),
+        icon: Icon(
+          icon,
+          size: 18,
+          color: Colors.black,
+        ),
+        label: Text(
+          title,
+          style: TextStyle(fontSize: 14, color: Colors.black),
         ),
       ),
     );

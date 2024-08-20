@@ -91,11 +91,14 @@ class _AddRecipeState extends State<AddRecipe> {
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: Container(
-
           child: AppBar(
-            title: Text('Add Recipe', style: TextStyle(color: const Color.fromARGB(255, 13, 13, 13), fontWeight: FontWeight.bold)),
+            title: Text('Add Recipe',
+                style: TextStyle(
+                    color: const Color.fromARGB(255, 13, 13, 13),
+                    fontWeight: FontWeight.bold)),
             backgroundColor: Colors.transparent,
-            iconTheme: IconThemeData(color: const Color.fromARGB(255, 13, 13, 13)),
+            iconTheme:
+                IconThemeData(color: const Color.fromARGB(255, 13, 13, 13)),
           ),
         ),
       ),
@@ -125,7 +128,8 @@ class _AddRecipeState extends State<AddRecipe> {
                         ],
                       ),
                       child: selectedImage == null
-                          ? Icon(Icons.camera_alt_outlined, size: 50, color: Colors.grey)
+                          ? Icon(Icons.camera_alt_outlined,
+                              size: 50, color: Colors.grey)
                           : ClipRRect(
                               borderRadius: BorderRadius.circular(12.0),
                               child: Image.file(
@@ -162,16 +166,32 @@ class _AddRecipeState extends State<AddRecipe> {
                 Center(
                   child: ElevatedButton(
                     style: ElevatedButton.styleFrom(
-                      foregroundColor: Colors.white, backgroundColor: Colors.orange[00],
+                      foregroundColor: Colors.white,
+                      backgroundColor:
+                          Colors.orange.shade600, 
                       shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(10),
+                        borderRadius: BorderRadius.circular(
+                            12), 
                       ),
-                      padding: EdgeInsets.symmetric(horizontal: 160, vertical: 12),
-                      elevation: 8.0,
-                      shadowColor: Colors.black.withOpacity(0.5),
+                      padding: EdgeInsets.symmetric(
+                        horizontal: MediaQuery.of(context).size.width *
+                            0.3, 
+                        vertical: 14, 
+                      ),
+                      elevation:
+                          10.0, 
+                      shadowColor: Colors.black
+                          .withOpacity(0.3),
                     ),
                     onPressed: uploadItem,
-                    child: Text('Save', style: TextStyle(fontSize: 16.0, fontWeight: FontWeight.bold)),
+                    child: Text(
+                      'Save',
+                      style: TextStyle(
+                        fontSize: 16.0,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1.0,
+                      ),
+                    ),
                   ),
                 ),
               ],
@@ -193,7 +213,8 @@ class _AddRecipeState extends State<AddRecipe> {
       children: [
         Text(
           label,
-          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
+          style: TextStyle(
+              fontSize: 18, fontWeight: FontWeight.bold, color: Colors.black87),
         ),
         SizedBox(height: 8.0),
         Container(
@@ -218,7 +239,7 @@ class _AddRecipeState extends State<AddRecipe> {
               hintStyle: TextStyle(color: Colors.grey[600]),
             ),
             minLines: minLines,
-            maxLines: null, 
+            maxLines: null,
           ),
         ),
       ],
