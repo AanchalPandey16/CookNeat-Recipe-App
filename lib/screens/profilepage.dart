@@ -1,4 +1,5 @@
 import 'dart:typed_data';
+import 'package:cook_n_eat/screens/favourite.dart';
 import 'package:cook_n_eat/screens/menu.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/widgets.dart';
@@ -9,7 +10,7 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'add_recipe.dart';
 import 'login.dart';
-import 'recipedetail.dart';
+import 'myrecipes.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class Profile extends StatefulWidget {
@@ -45,7 +46,6 @@ class _ProfileState extends State<Profile> {
             _username = profileSnapshot['username'] ?? '';
             _bio = profileSnapshot['bio'] ?? '';
             _profileImageUrl = profileSnapshot['profileImage'] ?? '';
-            // Debug print to verify URL
             print('Loaded profile image URL: $_profileImageUrl');
           });
         }
@@ -67,7 +67,7 @@ class _ProfileState extends State<Profile> {
           });
         }
 
-        _uploadImageAndSaveProfile(imageBytes);
+        await _uploadImageAndSaveProfile(imageBytes);
       } else {
         print('No image selected');
       }
@@ -144,6 +144,7 @@ class _ProfileState extends State<Profile> {
       }
     }
   }
+  
 
   void _showOptionsDialog() {
     showDialog(
@@ -172,6 +173,9 @@ class _ProfileState extends State<Profile> {
               ),
             ],
           ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
         );
       },
     );
@@ -186,7 +190,16 @@ class _ProfileState extends State<Profile> {
       context: context,
       builder: (BuildContext context) {
         return AlertDialog(
-          title: Text('Edit Profile'),
+          title: Center(
+            child: Text(
+              'Edit Profile',
+              style: TextStyle(
+                fontSize: 20,
+                fontWeight: FontWeight.bold,
+                color: Colors.orange.shade600,
+              ),
+            ),
+          ),
           content: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
@@ -194,6 +207,8 @@ class _ProfileState extends State<Profile> {
                 controller: _usernameController,
                 decoration: InputDecoration(
                   labelText: 'Username',
+                  labelStyle: TextStyle(color: Colors.orange.shade600),
+                  border: OutlineInputBorder(),
                 ),
               ),
               SizedBox(height: 16.0),
@@ -201,11 +216,28 @@ class _ProfileState extends State<Profile> {
                 controller: _bioController,
                 decoration: InputDecoration(
                   labelText: 'Bio',
+                  labelStyle: TextStyle(color: Colors.orange.shade600),
+                  border: OutlineInputBorder(),
                 ),
               ),
             ],
           ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10),
+          ),
           actions: [
+            // Cancel button
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text(
+                'Cancel',
+                style: TextStyle(color: Colors.black),
+              ),
+            ),
+            SizedBox(width: 10),
+
             TextButton(
               onPressed: () {
                 if (_usernameController.text.isNotEmpty &&
@@ -223,13 +255,10 @@ class _ProfileState extends State<Profile> {
                       SnackBar(content: Text('Fields cannot be empty')));
                 }
               },
-              child: Text('Save'),
-            ),
-            TextButton(
-              onPressed: () {
-                Navigator.pop(context);
-              },
-              child: Text('Cancel'),
+              child: Text(
+                'Save',
+                style: TextStyle(color: Colors.orange.shade600),
+              ),
             ),
           ],
         );
@@ -241,46 +270,32 @@ class _ProfileState extends State<Profile> {
     await _saveProfile();
   }
 
-  void _navigateToMyRecipes() {
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => RecipeList()),
-    );
-  }
 
-  void _showSettingsDialog() {
-    showDialog(
+  void _showSettingsDrawer() {
+    showModalBottomSheet(
       context: context,
       builder: (BuildContext context) {
-        return AlertDialog(
-          content: Column(
+        return Container(
+          width: double.infinity,
+          padding: EdgeInsets.all(16),
+          decoration: BoxDecoration(
+            color: Colors.white,
+            borderRadius: BorderRadius.only(
+              topLeft: Radius.circular(20),
+              topRight: Radius.circular(20),
+            ),
+          ),
+          child: Column(
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.logout, color: Colors.red),
-                title: Text('Logout'),
-                onTap: () async {
-                  SharedPreferences prefs;
-                  prefs = await SharedPreferences.getInstance();
-                  prefs.setBool('isLogin', false);
-                  await _auth.signOut();
+                leading: Icon(Icons.feedback,color: Colors.orange[600],),
+                title: Text('Feedback'),
+                onTap: () {
                   Navigator.pop(context);
-                  Navigator.pushReplacement(context,
-                      MaterialPageRoute(builder: (context) => Login()));
+                  _showFeedbackDialog(context);
                 },
               ),
-              if (!_isProfileSaved)
-                ListTile(
-                  leading: Icon(Icons.save),
-                  title: Text('Save Profile'),
-                  onTap: () {
-                    Navigator.pop(context);
-                    saveProfile();
-                    setState(() {
-                      _isProfileSaved = true;
-                    });
-                  },
-                ),
             ],
           ),
         );
@@ -288,7 +303,81 @@ class _ProfileState extends State<Profile> {
     );
   }
 
-  bool _isProfileSaved = false;
+  void _showFeedbackDialog(BuildContext context) {
+    final TextEditingController _feedbackController = TextEditingController();
+
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          content: Container(
+            width: double.maxFinite,
+            child: Column(
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                TextField(
+                  controller: _feedbackController,
+                  decoration: InputDecoration(
+                    labelText: 'Enter your feedback here',
+                    labelStyle: TextStyle(
+                        color: Colors.orange[600]), // Orange color for label
+                  ),
+                  maxLines: 4,
+                ),
+              ],
+            ),
+          ),
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(10), // Less circular
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pop(context);
+              },
+              child: Text('Cancel'),
+            ),
+            SizedBox(width: 10),
+            TextButton(
+              onPressed: () async {
+                String feedback = _feedbackController.text.trim();
+                if (feedback.isNotEmpty) {
+                  try {
+                    final User? user = FirebaseAuth.instance.currentUser;
+                    if (user != null) {
+                      await FirebaseFirestore.instance
+                          .collection('profiles')
+                          .doc(user.uid)
+                          .update({
+                        'feedback': feedback,
+                        'time': FieldValue.serverTimestamp(),
+                      });
+                      ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                          content: Text('Feedback sent successfully')));
+                    } else {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                          SnackBar(content: Text('No user logged in')));
+                    }
+                  } catch (e) {
+                    ScaffoldMessenger.of(context).showSnackBar(
+                        SnackBar(content: Text('Failed to send feedback')));
+                  }
+                  Navigator.pop(context);
+                } else {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                      SnackBar(content: Text('Feedback cannot be empty')));
+                }
+              },
+              style: TextButton.styleFrom(
+                foregroundColor: Colors.orange[600], // Orange color for text
+              ),
+              child: Text('Send'),
+            ),
+          ],
+        );
+      },
+    );
+  }
 
   @override
   void dispose() {
@@ -299,30 +388,25 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-          title: Text(
-            'Profile',
-            style: GoogleFonts.satisfy(
-              textStyle: TextStyle(
-                color: const Color.fromARGB(255, 11, 11, 11),
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-          centerTitle: true,
-          iconTheme: IconThemeData(color: Colors.black),
-          leading: IconButton(
-            icon: Icon(Icons.arrow_back, color: Colors.black),
-            onPressed: () {
-              Navigator.push(context, 
-              MaterialPageRoute(builder: (context)=> Menu()));
-            },
-          ),
-          actions: [
-            IconButton(
-              icon: Icon(Icons.settings, color: Colors.black),
-              onPressed: _showSettingsDialog,
-            ),
-          ],
+     title: Text(
+      'Profile',
+      style: GoogleFonts.courgette(
+        textStyle: TextStyle(
+          color: const Color.fromARGB(255, 11, 11, 11),
+          fontWeight: FontWeight.bold,
+        ),
+      ),
+    ),
+    centerTitle: true,
+    iconTheme: IconThemeData(color: Colors.black),
+    actions: [
+      IconButton(
+        icon: Icon(Icons.settings, color: Colors.black),
+        onPressed: _showSettingsDrawer,
+      ),
+    ],
+    backgroundColor: Colors.transparent,
+    elevation: 0,
         ),
         body: SingleChildScrollView(
             child: Column(children: [
@@ -332,49 +416,68 @@ class _ProfileState extends State<Profile> {
               children: [
                 GestureDetector(
                   onTap: _showOptionsDialog,
-                  child: CircleAvatar(
-                    radius: 70,
-                    backgroundColor: Colors.grey[200],
-                    child: _image != null
-                        ? ClipOval(
-                            child: Image.memory(
+                  child: Container(
+                    width: 150, // Increased width
+                    height: 150, // Increased height
+                    decoration: BoxDecoration(
+                      shape: BoxShape.circle,
+                      color: Colors.grey[200],
+                      border: Border.all(
+                        color: Colors.orange.shade400, // Border color
+                        width: 1,// Border width
+                      ),
+                      boxShadow: [
+                        BoxShadow(
+                          color: Colors.grey.withOpacity(0.5), // Shadow color
+                          spreadRadius: 3, // Spread radius
+                          blurRadius: 7, // Blur radius
+                          offset: Offset(0, 3), // Shadow offset
+                        ),
+                      ],
+                    ),
+                    child: ClipOval(
+                      child: _image != null
+                          ? Image.memory(
                               _image!,
                               fit: BoxFit.cover,
-                              width: 140,
-                              height: 140,
-                            ),
-                          )
-                        : _profileImageUrl.isNotEmpty
-                            ? ClipOval(
-                                child: Image.network(
+                              width: 140, // Adjusted width to fit container
+                              height: 140, // Adjusted height to fit container
+                            )
+                          : _profileImageUrl.isNotEmpty
+                              ? Image.network(
                                   _profileImageUrl,
                                   fit: BoxFit.cover,
-                                  width: 140,
-                                  height: 140,
+                                  width: 140, // Adjusted width to fit container
+                                  height:
+                                      140, // Adjusted height to fit container
+                                )
+                              : Icon(
+                                  Icons.person,
+                                  size: 70,
+                                  color: Colors.grey,
                                 ),
-                              )
-                            : Icon(
-                                Icons.person,
-                                size: 70,
-                                color: Colors.grey,
-                              ),
+                    ),
                   ),
                 ),
-                SizedBox(width: 20),
+                SizedBox(width: 25),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      Text(_username.isNotEmpty ? _username : 'Username',
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
-                          )),
+                      Text(
+                        _username.isNotEmpty ? _username : 'Username',
+                        style: TextStyle(
+                          fontSize: 22,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
                       SizedBox(height: 5),
-                      Text(_bio.isNotEmpty ? _bio : 'Bio',
-                          style: TextStyle(
-                            fontSize: 15,
-                          )),
+                      Text(
+                        _bio.isNotEmpty ? _bio : 'Bio',
+                        style: TextStyle(
+                          fontSize: 15,
+                        ),
+                      ),
                     ],
                   ),
                 ),
@@ -384,58 +487,184 @@ class _ProfileState extends State<Profile> {
           OutlinedButton(
             onPressed: _showEditProfileDialog,
             style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.symmetric(horizontal: 150, vertical: 2),
+              padding: EdgeInsets.symmetric(
+                  horizontal: 140,
+                  vertical:
+                      8), // Adjusted vertical padding for better appearance
               textStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.black,
+                color: Colors.orange[600], // Text color in orange
               ),
               side: BorderSide(
-                color: Colors.black,
-                width: 1.1,
+                color: Colors.orange.shade200, // Border color
+                width: 1.1, // Border width
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(10),
+                borderRadius: BorderRadius.circular(5), // Border radius
               ),
-              backgroundColor: Colors.transparent,
+              backgroundColor: Colors.orange[100], // Background color
             ),
-            child: Text('Edit Profile'),
+            child: Text(
+              'Edit Profile',
+              style: TextStyle(
+                color: Colors.orange[600], // Ensure text color is orange
+              ),
+            ),
           ),
-          Divider(
-            thickness: 1.0,
-            color: Colors.grey,
-            indent: 16.0,
-            endIndent: 16.0,
+          SizedBox(
+            height: 10,
           ),
           Container(
-            padding: const EdgeInsets.all(16.0),
+            height: MediaQuery.of(context).size.height,
+            padding: const EdgeInsets.all(20),
+            decoration: BoxDecoration(
+                borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+                color: Colors.orange[200]),
             child: Column(
               children: [
-                ListTile(
-                  leading: Icon(Icons.book, color: Colors.black),
-                  title:
-                      Text('My Recipes', style: TextStyle(color: Colors.black)),
-                  onTap: _navigateToMyRecipes,
+                SizedBox(
+                  height: 80,
+                  child: Material(
+                    elevation: 5,
+                    color: Colors.orange.shade50,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(10),
+                    ),
+                    child: ListTile(
+                      leading: Icon(Icons.add_circle,
+                          color: Colors.orange[600], size: 30),
+                      title: Text(
+                        'Add Recipe',
+                        style: TextStyle(
+                          color: Colors.black,
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                        ),
+                      ),
+                      onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => AddRecipe()),
+                        );
+                      },
+                    ),
+                  ),
                 ),
-                Divider(),
-                ListTile(
-                  leading: Icon(Icons.add_circle, color: Colors.black),
-                  title:
-                      Text('Add Recipe', style: TextStyle(color: Colors.black)),
-                  onTap: () {
-                    Navigator.push(
-                      context,
-                      MaterialPageRoute(builder: (context) => AddRecipe()),
-                    );
-                  },
+                SizedBox(height: 20),
+                Material(
+                  elevation: 5,
+                  color: Colors.orange.shade50,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    leading: Icon(Icons.book,
+                        color: Colors.orange.shade600, size: 30),
+                    title: Text(
+                      'My Recipes',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (context) => RecipeList()),
+                        );
+                      },
+                  ),
+                ),
+                SizedBox(height: 30),
+                Material(
+                  elevation: 5,
+                  color: Colors.orange.shade50,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    leading: Icon(Icons.add_circle,
+                        color: Colors.orange[600], size: 30),
+                    title: Text(
+                      'Favourite Recipe',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => FavoritePage()),
+                      );
+                    },
+                  ),
+                ),
+                SizedBox(height: 30),
+                Material(
+                  elevation: 5,
+                  color: Colors.orange.shade50,
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(10),
+                  ),
+                  child: ListTile(
+                    leading: Icon(Icons.logout, color: Colors.red, size: 30),
+                    title: Text(
+                      'Logout',
+                      style: TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                    onTap: () {
+                      showDialog(
+                        context: context,
+                        builder: (BuildContext context) {
+                          return AlertDialog(
+                            title: Text(
+                              "Confirmation",
+                              style: TextStyle(color: Colors.red),
+                            ),
+                            content: Text("Are you sure you want to logout?"),
+                            actions: [
+                              TextButton(
+                                child: Text("Cancel",
+                                    style: TextStyle(color: Colors.black)),
+                                onPressed: () {
+                                  Navigator.of(context)
+                                      .pop(); // Close the dialog
+                                },
+                              ),
+                              TextButton(
+                                child: Text("Logout",
+                                    style: TextStyle(color: Colors.red)),
+                                onPressed: () async {
+                                  SharedPreferences prefs =
+                                      await SharedPreferences.getInstance();
+                                  prefs.setBool('isLogin', false);
+                                  await _auth.signOut();
+                                  Navigator.of(context).pop();
+                                  Navigator.pushReplacement(
+                                    context,
+                                    MaterialPageRoute(
+                                        builder: (context) => Login()),
+                                  );
+                                },
+                              ),
+                            ],
+                          );
+                        },
+                      );
+                    },
+                  ),
                 ),
               ],
             ),
-          ),
-        ]
-        )
-        )
-     
-        );
+          )
+        ])));
   }
 }

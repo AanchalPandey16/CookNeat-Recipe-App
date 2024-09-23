@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/recipedet.dart'; // Ensure this path is correct
 
@@ -99,50 +100,55 @@ class RecipeListPage extends StatelessWidget {
         return [];
     }
   }
- Widget _buildRecipeItem(BuildContext context, String recipeName, String imageUrl) {
-    return GestureDetector(
-      onTap: () {
-        Navigator.push(
-          context,
-          MaterialPageRoute(
-            builder: (context) => RecipeDetailPage(recipeName: recipeName),
+Widget _buildRecipeItem(BuildContext context, String recipeName, String imageUrl) {
+  return GestureDetector(
+    onTap: () {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => RecipeDetailPage(
+            recipeName: recipeName,
+            imageUrl: imageUrl, collectionName: 'recipe_detail',
           ),
-        );
-      },
-      child: Container(
-        width: MediaQuery.of(context).size.width,
-        height: 150.0,
-        child: Stack(
-          fit: StackFit.expand,
-          children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(8.0),
-              child: Image.network(
-                imageUrl,
-                fit: BoxFit.cover,
-              ),
-            ),
-            Positioned(
-              bottom: 0,
-              left: 0,
-              right: 0,
-              child: Container(
-                color: Colors.black54,
-                padding: EdgeInsets.all(12.0),
-                child: Text(
-                  recipeName,
-                  style: TextStyle(
-                    fontSize: 14.0,
-                    fontWeight: FontWeight.bold,
-                    color: Colors.white,
-                  ),
-                  textAlign: TextAlign.start,
-                ),
-              ),
-            ),
-          ],
         ),
+      );
+    },
+    child: Container(
+      width: MediaQuery.of(context).size.width,
+      height: 150.0,
+      child: Stack(
+        fit: StackFit.expand,
+        children: [
+          ClipRRect(
+            borderRadius: BorderRadius.circular(8.0),
+            child: CachedNetworkImage(
+              imageUrl: imageUrl,
+              fit: BoxFit.cover,
+              placeholder: (context, url) => Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.orange[200]!),)),
+              errorWidget: (context, url, error) => Icon(Icons.error),
+            ),
+          ),
+          Positioned(
+            bottom: 0,
+            left: 0,
+            right: 0,
+            child: Container(
+              color: Colors.black54,
+              padding: EdgeInsets.all(12.0),
+              child: Text(
+                recipeName,
+                style: TextStyle(
+                  fontSize: 14.0,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
+                ),
+                textAlign: TextAlign.start,
+              ),
+            ),
+          ),
+        ],
       ),
-    );
-  }
+    ),
+  );
+}
 }

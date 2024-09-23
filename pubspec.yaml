@@ -58,6 +58,11 @@ dependencies:
   badges: 
   get: 
   curved_navigation_bar: 
+  auto_size_text: 
+  cached_network_image: ^3.4.1
+  flutter_image_compress: ^2.3.0
+  flutter_cache_manager:
+
 
 
  

@@ -54,47 +54,11 @@ Timer(const Duration(seconds: 2), () {
           
           Positioned.fill(
             child: Image.asset(
-              'assets/splash.jpeg',
+              'assets/splash.png',
               fit: BoxFit.cover,
             ),
           ),
 
-         
-          Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(80.0), 
-            child: Text(
-              'CookNeat',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 36.0, 
-                fontWeight: FontWeight.bold,
-              ),
-             
-            ),
-            
-          ),
-          
-        ),
-        SizedBox(height: 50.0,),
-        Align(
-          alignment: Alignment.topCenter,
-          child: Padding(
-            padding: const EdgeInsets.all(40.0), 
-            child: Text(
-              'Cook the way you like!',
-              style: TextStyle(
-                color: Colors.white,
-                fontSize: 25.0, 
-                fontWeight: FontWeight.bold,
-              ),
-             
-            ),
-            
-          ),
-          
-        )
 
 
         ],

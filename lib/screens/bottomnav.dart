@@ -1,3 +1,4 @@
+import 'package:cook_n_eat/screens/favourite.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/menu.dart';
 import 'package:cook_n_eat/screens/profilepage.dart';
@@ -12,25 +13,23 @@ class Bottomnav extends StatefulWidget {
 }
 
 class _BottomnavState extends State<Bottomnav> {
-  int CurrentTabIndex=0;
+  int CurrentTabIndex = 0;
 
   late List<Widget> pages;
-  late Widget currentPage;
   late Homepage home;
-  late Menu menu ;
+  late Menu menu;
   late Profile profile;
 
   @override
-
-  void initState(){
+  void initState() {
+    super.initState();
     home = Homepage();
     menu = Menu();
     profile = Profile();
-    pages=[home, menu, profile];
-        super.initState();
-    
+    pages = [home, menu, profile];
   }
 
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       bottomNavigationBar: CurvedNavigationBar(
@@ -38,17 +37,22 @@ class _BottomnavState extends State<Bottomnav> {
         backgroundColor: const Color.fromARGB(255, 252, 252, 251),
         color: Colors.orange.shade600,
         animationDuration: Duration(milliseconds: 500),
-        onTap: (int index){
+        onTap: (int index) {
           setState(() {
-            CurrentTabIndex=index;
+            CurrentTabIndex = index;
           });
         },
         items: [
-        Icon(Icons.home_filled, color: Colors.white),
-        Icon(Icons.local_restaurant_outlined, color: Colors.white),
-        Icon(Icons.person, color: Colors.white),
-      ]),
-      body: pages[CurrentTabIndex],
+          Icon(Icons.home_filled, color: Colors.white),
+          Icon(Icons.local_restaurant_outlined, color: Colors.white),
+          Icon(Icons.person, color: Colors.white),
+        ],
+      ),
+     
+      body: IndexedStack(
+        index: CurrentTabIndex,
+        children: pages,
+      ),
     );
   }
 }

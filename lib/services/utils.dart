@@ -10,5 +10,5 @@ Future<Uint8List?> pickImage(ImageSource source) async {
     return await _file.readAsBytes();
   }
   print('No image selected');
-  return null;  // Return null if no image is selected
+  return null;  
 }

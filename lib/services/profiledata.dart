@@ -11,17 +11,22 @@ class ProfileData extends GetxController {
     try {
       DocumentSnapshot snapshot = await _db.collection('profiles').doc(userId).get();
       if (snapshot.exists) {
-        return snapshot.data() as Map<String, dynamic>;
+        return snapshot.data() as Map<String, dynamic>? ?? {}; // Ensure a default empty map
       } else {
         throw Exception('Profile not found');
       }
     } catch (e) {
-      throw Exception('Error fetching profile: $e');
+      throw Exception('Error fetching profile: ${e.toString()}');
     }
   }
 
   // Create or update user profile data
   Future<void> createOrUpdateProfile(String userId, {required String username, required String bio, String? imageUrl}) async {
+    // Input validation
+    if (username.isEmpty || bio.isEmpty) {
+      throw Exception('Username and bio cannot be empty');
+    }
+
     try {
       await _db.collection('profiles').doc(userId).set({
         'username': username,
@@ -29,7 +34,7 @@ class ProfileData extends GetxController {
         'profileImage': imageUrl ?? '', // Optional field
       }, SetOptions(merge: true)); // Use merge to update only specified fields
     } catch (e) {
-      throw Exception('Error creating or updating profile: $e');
+      throw Exception('Error creating or updating profile: ${e.toString()}');
     }
   }
 }

@@ -21,7 +21,7 @@ class _ForgotpassState extends State<Forgotpass> {
     final email = _emailController.text.trim();
     
     if (email.isEmpty) {
-      // Check if the email field is empty
+      
       showDialog(
         context: context,
         builder: (context) {

@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:share_plus/share_plus.dart';
 import 'package:http/http.dart' as http;
 import 'dart:io';
@@ -7,8 +8,15 @@ import 'dart:async';
 
 class RecipeDetailPage extends StatefulWidget {
   final String recipeName;
+  final String collectionName;
+  final String imageUrl;
 
-  const RecipeDetailPage({Key? key, required this.recipeName}) : super(key: key);
+  const RecipeDetailPage({
+    Key? key,
+    required this.recipeName,
+    required this.imageUrl,
+    required this.collectionName,
+  }) : super(key: key);
 
   @override
   _RecipeDetailPageState createState() => _RecipeDetailPageState();
@@ -17,17 +25,19 @@ class RecipeDetailPage extends StatefulWidget {
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
   bool showIngredients = true; // State variable to toggle between ingredients and steps
   Map<String, dynamic>? recipeData;
+  bool isFavorited = false;
 
   @override
   void initState() {
     super.initState();
-    _fetchRecipeData(); // Fetch recipe data on initialization
+    _fetchRecipeData();
+    _checkIfFavorited(); // Check if the recipe is already favorited
   }
 
   Future<void> _fetchRecipeData() async {
     try {
       DocumentSnapshot snapshot = await FirebaseFirestore.instance
-          .collection('recipe_detail')
+          .collection(widget.collectionName)
           .doc(widget.recipeName)
           .get();
 
@@ -40,6 +50,23 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       }
     } catch (e) {
       print('Error fetching recipe data: $e');
+    }
+  }
+
+  Future<void> _checkIfFavorited() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final favDoc = await FirebaseFirestore.instance
+          .collection('favorites')
+          .doc(user.uid)
+          .collection('recipes')
+          .doc(widget.recipeName)
+          .get();
+
+      setState(() {
+        isFavorited = favDoc.exists;
+      });
     }
   }
 
@@ -90,6 +117,33 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
     }
   }
 
+  Future<void> _toggleFavorite() async {
+    final user = FirebaseAuth.instance.currentUser;
+
+    if (user != null) {
+      final favCollection = FirebaseFirestore.instance
+          .collection('favorites')
+          .doc(user.uid)
+          .collection('recipes');
+
+      if (isFavorited) {
+        // Remove recipe from favorites
+        await favCollection.doc(widget.recipeName).delete();
+      } else {
+        // Add recipe to favorites
+        await favCollection.doc(widget.recipeName).set({
+          'recipeName': widget.recipeName,
+          'imageUrl': widget.imageUrl,
+          'collectionName': widget.collectionName, // Ensure this field is added
+        });
+      }
+
+      setState(() {
+        isFavorited = !isFavorited;
+      });
+    }
+  }
+
   String _formatIngredients(String ingredients) {
     return ingredients.split(',').map((ingredient) => ingredient.trim()).join('\n');
   }
@@ -107,7 +161,7 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             children: [
               Expanded(
                 child: recipeData == null
-                    ? Center(child: CircularProgressIndicator()) // Show loading only initially
+                    ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.orange[200]!)))
                     : SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -173,20 +227,24 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                   Row(
                                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        widget.recipeName,
-                                        style: TextStyle(
-                                          fontSize: 28.0,
-                                          fontWeight: FontWeight.bold,
+                                      Expanded(
+                                        child: Text(
+                                          widget.recipeName,
+                                          style: TextStyle(
+                                            fontSize: 28.0,
+                                            fontWeight: FontWeight.bold,
+                                          ),
+                                          overflow: TextOverflow.visible,
                                         ),
                                       ),
                                       Row(
                                         children: [
                                           IconButton(
-                                            icon: Icon(Icons.favorite_border),
-                                            onPressed: () {
-                                              // Add functionality for adding to favorites
-                                            },
+                                            icon: Icon(
+                                              isFavorited ? Icons.favorite : Icons.favorite_border,
+                                              color: isFavorited ? Colors.orange.shade600 : Colors.black, size: 29,
+                                            ),
+                                            onPressed: _toggleFavorite,
                                           ),
                                           IconButton(
                                             icon: Icon(Icons.share),
@@ -233,8 +291,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                   Container(
                                     padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
                                     decoration: BoxDecoration(
-                                      color: Colors.white, // White background for a cleaner look
-                                      borderRadius: BorderRadius.circular(12.0), // Slightly smaller border radius
+                                      color: Colors.white,
+                                      borderRadius: BorderRadius.circular(12.0),
                                       boxShadow: [
                                         BoxShadow(
                                           color: Colors.black12,
@@ -249,26 +307,22 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         Text(
                                           showIngredients ? 'Ingredients' : 'Steps',
                                           style: TextStyle(
-                                            fontSize: 20.0, // Reduced font size
-                                            fontWeight: FontWeight.w600, // Slightly lighter than bold
-                                            color: Colors.orange.shade800, // A bit darker for better contrast
+                                            fontSize: 20.0,
+                                            fontWeight: FontWeight.w600,
+                                            color: Colors.orange.shade800,
                                           ),
                                         ),
-                                        SizedBox(height: 8.0), // Reduced space between title and content
+                                        SizedBox(height: 8.0),
                                         Divider(
-                                          color: Colors.orange.shade200, // Light orange divider for subtle separation
-                                          thickness: 1.5, // Slightly thicker divider
+                                          color: Colors.orange.shade200,
+                                          thickness: 1.5,
                                         ),
-                                        SizedBox(height: 8.0), // Reduced space between divider and content
+                                        SizedBox(height: 8.0),
                                         Text(
                                           showIngredients
                                               ? _formatIngredients(recipeData!['ingredients'] ?? 'No ingredients available.')
                                               : _formatSteps(recipeData!['steps'] ?? 'No steps available.'),
-                                          style: TextStyle(
-                                            fontSize: 16.0, // Smaller font size for content
-                                            height: 1.5, // Line height for better readability
-                                            color: Colors.black87, // Darker color for better readability
-                                          ),
+                                          style: TextStyle(fontSize: 16.0),
                                         ),
                                       ],
                                     ),

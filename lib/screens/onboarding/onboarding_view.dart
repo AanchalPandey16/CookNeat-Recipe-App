@@ -1,4 +1,5 @@
 import 'package:cook_n_eat/screens/login.dart';
+import 'package:cook_n_eat/screens/signin.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/onboarding/onboarding_items.dart';
 import 'package:smooth_page_indicator/smooth_page_indicator.dart';
@@ -94,7 +95,7 @@ class _OnboardingViewState extends State<OnboardingView> {
       height: 50,
       child: TextButton(
         onPressed: (){
-          Navigator.push(context, MaterialPageRoute(builder: (context) => Login()));
+          Navigator.push(context, MaterialPageRoute(builder: (context) => SignIn()));
         },
       child: Text("Let's get started", style: TextStyle( color: Colors.white
       ),)),
