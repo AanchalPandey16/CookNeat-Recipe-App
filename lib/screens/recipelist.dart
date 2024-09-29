@@ -138,7 +138,7 @@ Widget _buildRecipeItem(BuildContext context, String recipeName, String imageUrl
               child: Text(
                 recipeName,
                 style: TextStyle(
-                  fontSize: 14.0,
+                  fontSize: 18,
                   fontWeight: FontWeight.bold,
                   color: Colors.white,
                 ),

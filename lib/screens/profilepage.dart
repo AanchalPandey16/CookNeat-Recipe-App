@@ -390,9 +390,10 @@ class _ProfileState extends State<Profile> {
         appBar: AppBar(
      title: Text(
       'Profile',
-      style: GoogleFonts.courgette(
+      style: GoogleFonts.allura(
         textStyle: TextStyle(
-          color: const Color.fromARGB(255, 11, 11, 11),
+          fontSize: 35,
+          color:  Colors.orange.shade500,
           fontWeight: FontWeight.bold,
         ),
       ),
@@ -401,7 +402,7 @@ class _ProfileState extends State<Profile> {
     iconTheme: IconThemeData(color: Colors.black),
     actions: [
       IconButton(
-        icon: Icon(Icons.settings, color: Colors.black),
+        icon: Icon(Icons.settings, color: Colors.orange.shade600),
         onPressed: _showSettingsDrawer,
       ),
     ],

@@ -23,15 +23,16 @@ class RecipeDetailPage extends StatefulWidget {
 }
 
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
-  bool showIngredients = true; // State variable to toggle between ingredients and steps
+  bool showIngredients = true; 
   Map<String, dynamic>? recipeData;
   bool isFavorited = false;
+  bool isImageCached = false; // Track if the image has been cached
 
   @override
   void initState() {
     super.initState();
     _fetchRecipeData();
-    _checkIfFavorited(); // Check if the recipe is already favorited
+    _checkIfFavorited();
   }
 
   Future<void> _fetchRecipeData() async {
@@ -44,6 +45,14 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       if (snapshot.exists) {
         setState(() {
           recipeData = snapshot.data() as Map<String, dynamic>?;
+
+          // Pre-cache the image after setting the recipe data
+          WidgetsBinding.instance.addPostFrameCallback((_) {
+            if (recipeData != null && recipeData!['imageUrl'] != null && recipeData!['imageUrl'].isNotEmpty && !isImageCached) {
+              precacheImage(NetworkImage(recipeData!['imageUrl']), context);
+              isImageCached = true; // Set to true after caching
+            }
+          });
         });
       } else {
         throw Exception('Recipe not found.');
@@ -309,19 +318,14 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                           style: TextStyle(
                                             fontSize: 20.0,
                                             fontWeight: FontWeight.w600,
-                                            color: Colors.orange.shade800,
+                                            color: Colors.orange.shade600,
                                           ),
-                                        ),
-                                        SizedBox(height: 8.0),
-                                        Divider(
-                                          color: Colors.orange.shade200,
-                                          thickness: 1.5,
                                         ),
                                         SizedBox(height: 8.0),
                                         Text(
                                           showIngredients
-                                              ? _formatIngredients(recipeData!['ingredients'] ?? 'No ingredients available.')
-                                              : _formatSteps(recipeData!['steps'] ?? 'No steps available.'),
+                                              ? _formatIngredients(recipeData!['ingredients'])
+                                              : _formatSteps(recipeData!['steps']),
                                           style: TextStyle(fontSize: 16.0),
                                         ),
                                       ],

@@ -97,6 +97,7 @@ class _AddRecipeState extends State<AddRecipe> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.orange[200],
       appBar: PreferredSize(
         preferredSize: Size.fromHeight(60.0),
         child: AppBar(

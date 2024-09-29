@@ -1,3 +1,4 @@
+import 'package:cook_n_eat/screens/bottomnav.dart';
 import 'package:cook_n_eat/screens/onboarding/onboarding_view.dart';
 import 'package:cook_n_eat/services/auth.dart';
 import 'package:flutter/material.dart';
@@ -72,7 +73,7 @@ Future<void> _register() async {
     if (user != null) {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => Homepage()),
+        MaterialPageRoute(builder: (context) => Bottomnav()),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

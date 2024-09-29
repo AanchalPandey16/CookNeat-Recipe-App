@@ -33,7 +33,6 @@ class _HomepageState extends State<Homepage> {
   // This variable will be used to check if we have already fetched data
   bool _isDataFetched = false;
 
-  // Fetch recipes only once and cache immediately
   Future<void> _fetchRecipes() async {
     try {
       if (!_isDataFetched) {
@@ -80,10 +79,10 @@ class _HomepageState extends State<Homepage> {
                 children: [
                   Expanded(
                     child: Text(
-                      "Hello Foodie,\nWant to make your\nfavourite meal?",
+                      "Hey Foodie!\nCraving your favorite dish?\nLet’s cook up something delicious!",
                       style: TextStyle(
                         color: Colors.black,
-                        fontSize: 25,
+                        fontSize: 18.5,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -93,14 +92,14 @@ class _HomepageState extends State<Homepage> {
                     borderRadius: BorderRadius.circular(5),
                     child: Image.asset(
                       "assets/recipe.png",
-                      height: 40,
-                      width: 40,
+                      height: 45,
+                      width: 45,
                       fit: BoxFit.cover,
                     ),
                   ),
                 ],
               ),
-              const SizedBox(height: 20),
+              const SizedBox(height: 15),
               TextField(
                 controller: _searchController,
                 decoration: InputDecoration(
@@ -115,7 +114,8 @@ class _HomepageState extends State<Homepage> {
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
                     borderSide: BorderSide(
-                        color: Colors.orange[200]!, width: 2.0), // Focused border color
+                        color: Colors.orange[200]!,
+                        width: 2.0), // Focused border color
                   ),
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -138,15 +138,16 @@ class _HomepageState extends State<Homepage> {
                   ],
                 ),
               ),
+             
               const SizedBox(height: 20),
               Text(
-                'Popular Recipes -',
+                'Best Picks:',
                 style: TextStyle(
                   fontSize: 20,
                   fontWeight: FontWeight.bold,
                 ),
               ),
-              const SizedBox(height: 10),
+              const SizedBox(height: 2),
               _cachedRecipes.isEmpty
                   ? Center(
                       child: Text(
@@ -185,7 +186,7 @@ class _HomepageState extends State<Homepage> {
       children: filteredBySearch.map((recipe) {
         return GestureDetector(
           onTap: () {
-            // Precache the image before navigating
+           
             if (recipe['imageUrl'] != null && recipe['imageUrl'].isNotEmpty) {
               precacheImage(
                 CachedNetworkImageProvider(recipe['imageUrl']),
@@ -223,7 +224,7 @@ class _HomepageState extends State<Homepage> {
                 children: [
                   Container(
                     width: MediaQuery.of(context).size.width,
-                    height: 200,
+                    height: 226,
                     child: CachedNetworkImage(
                       imageUrl: recipe['imageUrl'] ?? '',
                       fit: BoxFit.cover,
@@ -249,7 +250,7 @@ class _HomepageState extends State<Homepage> {
                         style: TextStyle(
                           color: Colors.white,
                           fontWeight: FontWeight.bold,
-                          fontSize: 16,
+                          fontSize: 18,
                         ),
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -277,12 +278,12 @@ class _HomepageState extends State<Homepage> {
         decoration: BoxDecoration(
           color: _selectedCategory == category
               ? Colors.orange[400]
-              : Colors.grey[300],
+              : Colors.orange[100],
           borderRadius: BorderRadius.circular(20),
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20),
+            Icon(icon, size: 20, color: Colors.white,),
             SizedBox(width: 5),
             Text(category),
           ],

@@ -1,21 +1,79 @@
+import 'dart:convert'; // Import for JSON encoding/decoding
 import 'dart:io';
-import 'package:cached_network_image/cached_network_image.dart';
-import 'package:http/http.dart' as http;
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:share_plus/share_plus.dart';
+import 'package:shared_preferences/shared_preferences.dart';
+import 'package:http/http.dart' as http;
 
 class RecipeList extends StatefulWidget {
   @override
   _RecipeListState createState() => _RecipeListState();
 }
-class _RecipeListState extends State<RecipeList> {
+
+class _RecipeListState extends State<RecipeList>
+    with AutomaticKeepAliveClientMixin<RecipeList> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
   String _searchQuery = '';
-  bool _isAdding = false; 
+  List<Map<String, dynamic>> _cachedRecipes = []; // Store cached recipes
+  bool _isLoading = true; // Track loading state
+
+  @override
+  void initState() {
+    super.initState();
+    _loadCachedRecipes(); // Load cached recipes if available
+    _fetchRecipes(); // Fetch recipes from Firestore
+  }
+
+  Future<void> _loadCachedRecipes() async {
+    final prefs = await SharedPreferences.getInstance();
+    final cachedData = prefs.getString('cachedRecipes');
+    if (cachedData != null) {
+      setState(() {
+        _cachedRecipes = List<Map<String, dynamic>>.from(json.decode(cachedData));
+        _isLoading = false; // Set loading to false after loading cached data
+      });
+    }
+  }
+
+  Future<void> _cacheRecipes(List<Map<String, dynamic>> recipes) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setString('cachedRecipes', json.encode(recipes));
+  }
+
+  Future<void> _fetchRecipes() async {
+    final userId = FirebaseAuth.instance.currentUser?.uid;
+    if (userId == null) {
+      setState(() {
+        _isLoading = false; // Set loading to false if no user is logged in
+      });
+      return;
+    }
+
+    try {
+      final recipesSnapshot = await _firestore
+          .collection('recipes')
+          .where('userId', isEqualTo: userId)
+          .get();
+      List<Map<String, dynamic>> recipes = recipesSnapshot.docs
+          .map((doc) => doc.data() as Map<String, dynamic>)
+          .toList();
+      setState(() {
+        _cachedRecipes = recipes; // Update cached recipes
+        _isLoading = false; // Set loading to false after fetching
+      });
+      await _cacheRecipes(recipes); // Cache them
+    } catch (e) {
+      print('Error fetching recipes: $e');
+      setState(() {
+        _isLoading = false; // Set loading to false on error
+      });
+    }
+  }
 
   void _toggleSearch() {
     setState(() {
@@ -27,44 +85,15 @@ class _RecipeListState extends State<RecipeList> {
     });
   }
 
-  Future<void> _addRecipe() async {
-    if (_isAdding) return; // Prevent multiple clicks
-
-    setState(() {
-      _isAdding = true; // Set to true to disable button
-    });
-
-    try {
-      // Simulate a long process
-      await Future.delayed(Duration(seconds: 2));
-
-      // Add your recipe adding logic here
-
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Recipe added successfully')),
-      );
-    } catch (e) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to add recipe')),
-      );
-    } finally {
-      setState(() {
-        _isAdding = false; // Reset to allow further actions
-      });
-    }
-  }
+  @override
+  bool get wantKeepAlive => true; // Keep the state alive
 
   @override
   Widget build(BuildContext context) {
-    final userId = FirebaseAuth.instance.currentUser?.uid;
-
-    if (userId == null) {
-      return Scaffold(
-        body: Center(child: Text('User not logged in')),
-      );
-    }
+    super.build(context); // Call super.build to maintain keep-alive status
 
     return Scaffold(
+      backgroundColor: Colors.orange[200],
       body: Container(
         child: Column(
           children: [
@@ -94,132 +123,100 @@ class _RecipeListState extends State<RecipeList> {
               ],
             ),
             Expanded(
-              child: StreamBuilder<QuerySnapshot>(
-                stream: _firestore
-                    .collection('recipes')
-                    .where('userId', isEqualTo: userId)
-                    .snapshots(),
-                builder: (context, snapshot) {
-                  if (snapshot.connectionState == ConnectionState.waiting) {
-                    return Center(
-                      child: CircularProgressIndicator(
-                        color: Colors.orange[600], // Orange shade 600
-                      ),
-                    );
-                  }
+              child: _isLoading
+                  ? Center(
+                      child: CircularProgressIndicator(), // Show a loading indicator while fetching data
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.all(10.0),
+                      itemCount: _cachedRecipes.length,
+                      itemBuilder: (context, index) {
+                        final recipe = _cachedRecipes[index];
 
-                  if (snapshot.hasError) {
-                    return Center(child: Text('Error: ${snapshot.error}'));
-                  }
-
-                  if (!snapshot.hasData || snapshot.data!.docs.isEmpty) {
-                    return Center(child: Text('No recipes found.'));
-                  }
-
-                  final recipes = snapshot.data!.docs
-                      .where((doc) {
-                        final recipe = doc.data() as Map<String, dynamic>;
-                        final name = recipe['name']?.toLowerCase() ?? '';
-                        return name.contains(_searchQuery);
-                      })
-                      .toList();
-
-                  if (recipes.isEmpty) {
-                    return Center(child: Text('No results found.'));
-                  }
-
-                  return ListView.builder(
-                    padding: EdgeInsets.all(10.0),
-                    itemCount: recipes.length,
-                    itemBuilder: (context, index) {
-                      final recipe = recipes[index].data() as Map<String, dynamic>;
-
-                      return Container(
-                        margin: EdgeInsets.only(bottom: 20.0),
-                        decoration: BoxDecoration(
-                          color: Colors.white,
-                          borderRadius: BorderRadius.circular(20.0),
-                          boxShadow: [
-                            BoxShadow(
-                              color: Colors.black26,
-                              offset: Offset(0, 8),
-                              blurRadius: 16.0,
-                            ),
-                          ],
-                        ),
-                        child: InkWell(
-                          onTap: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => RecipeDetail(recipe: recipe),
+                        return Container(
+                          margin: EdgeInsets.only(bottom: 20.0),
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(20.0),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black26,
+                                offset: Offset(0, 8),
+                                blurRadius: 16.0,
                               ),
-                            );
-                          },
-                          child: Stack(
-                            children: [
-                              if (recipe['image'] != null)
-                                CachedNetworkImage(
-                                  imageUrl: recipe['image'],
-                                  height: 190,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                  placeholder: (context, url) => Center(
-                                    child: CircularProgressIndicator(
-                                      color: Colors.orange[600], // Orange shade 600
-                                    ),
-                                  ),
-                                  errorWidget: (context, url, error) => Icon(Icons.error),
-                                  imageBuilder: (context, imageProvider) => Container(
+                            ],
+                          ),
+                          child: InkWell(
+                            onTap: () {
+                              Navigator.push(
+                                context,
+                                MaterialPageRoute(
+                                  builder: (context) => RecipeDetail(recipe: recipe),
+                                ),
+                              );
+                            },
+                            child: Stack(
+                              children: [
+                                if (recipe['image'] != null)
+                                  CachedNetworkImage(
+                                    imageUrl: recipe['image'],
                                     height: 190,
                                     width: double.infinity,
-                                    decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
-                                      image: DecorationImage(
-                                        image: imageProvider,
-                                        fit: BoxFit.cover,
-                                      ),
+                                    fit: BoxFit.cover,
+                                    placeholder: (context, url) => Container(
+                                      height: 190,
+                                      width: double.infinity,
+                                      color: Colors.grey[300],
                                     ),
-                                    child: Container(
+                                    errorWidget: (context, url, error) => Icon(Icons.error),
+                                    imageBuilder: (context, imageProvider) => Container(
+                                      height: 190,
+                                      width: double.infinity,
                                       decoration: BoxDecoration(
-                                        gradient: LinearGradient(
-                                          colors: [Colors.black.withOpacity(0.3), Colors.transparent],
-                                          begin: Alignment.bottomCenter,
-                                          end: Alignment.topCenter,
+                                        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+                                        image: DecorationImage(
+                                          image: imageProvider,
+                                          fit: BoxFit.cover,
+                                        ),
+                                      ),
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          gradient: LinearGradient(
+                                            colors: [Colors.black.withOpacity(0.3), Colors.transparent],
+                                            begin: Alignment.bottomCenter,
+                                            end: Alignment.topCenter,
+                                          ),
                                         ),
                                       ),
                                     ),
                                   ),
-                                ),
-                              Positioned(
-                                bottom: 0,
-                                left: 0,
-                                right: 0,
-                                child: Container(
-                                  padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
-                                  decoration: BoxDecoration(
-                                    color: Colors.black.withOpacity(0.6),
-                                  ),
-                                  child: Text(
-                                    recipe['name'] ?? 'No Name',
-                                    style: TextStyle(
-                                      color: Colors.white,
-                                      fontSize: 18.0,
-                                      fontWeight: FontWeight.bold,
+                                Positioned(
+                                  bottom: 0,
+                                  left: 0,
+                                  right: 0,
+                                  child: Container(
+                                    padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    decoration: BoxDecoration(
+                                      color: Colors.black.withOpacity(0.6),
                                     ),
-                                    overflow: TextOverflow.ellipsis,
-                                    maxLines: 1,
+                                    child: Text(
+                                      recipe['name'] ?? 'No Name',
+                                      style: TextStyle(
+                                        color: Colors.white,
+                                        fontSize: 18.0,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                      overflow: TextOverflow.ellipsis,
+                                      maxLines: 1,
+                                    ),
                                   ),
                                 ),
-                              ),
-                            ],
+                              ],
+                            ),
                           ),
-                        ),
-                      );
-                    },
-                  );
-                },
-              ),
+                        );
+                      },
+                    ),
             ),
           ],
         ),
@@ -227,7 +224,6 @@ class _RecipeListState extends State<RecipeList> {
     );
   }
 }
-
 
 class RecipeDetail extends StatefulWidget {
   final Map<String, dynamic> recipe;
@@ -347,53 +343,6 @@ class _RecipeDetailState extends State<RecipeDetail> {
     }
   }
 
-  Future<String?> _downloadImage(String imageUrl) async {
-    try {
-      final response = await http.get(Uri.parse(imageUrl));
-      if (response.statusCode == 200) {
-        final directory = Directory.systemTemp;
-        final filePath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.png';
-        final file = File(filePath);
-        await file.writeAsBytes(response.bodyBytes);
-        return filePath;
-      } else {
-        throw Exception('Failed to download image');
-      }
-    } catch (e) {
-      print('Error downloading image: $e');
-      return null;
-    }
-  }
-
-  Future<void> _shareRecipe() async {
-    try {
-      if (widget.recipe['image'] == null) {
-        throw Exception('Recipe image is null.');
-      }
-
-      final imageUrl = widget.recipe['image'];
-      final recipeLink = 'myapp://recipes/${widget.recipe['name']}';
-
-      String? imagePath;
-      if (imageUrl.isNotEmpty) {
-        imagePath = await _downloadImage(imageUrl);
-      }
-
-      final shareText = 'Check out this recipe:\n\nRecipe Link: $recipeLink';
-
-      if (imagePath != null) {
-        await Share.shareXFiles(
-          [XFile(imagePath)],
-          text: shareText,
-        );
-      } else {
-        await Share.share(shareText);
-      }
-    } catch (e) {
-      print('Error sharing recipe: $e');
-    }
-  }
-
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -424,9 +373,13 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   ),
                                   child: ClipRRect(
                                     borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
-                                    child: Image.network(
-                                      widget.recipe['image'],
+                                    child: CachedNetworkImage(
+                                      imageUrl: widget.recipe['image'],
                                       fit: BoxFit.cover,
+                                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) => Center(
+                                        child: Icon(Icons.image, size: 60.0, color: Colors.grey[600]),
+                                      ),
                                     ),
                                   ),
                                 )
@@ -476,7 +429,6 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                     ),
                                   ),
                                 ),
-                               
                               ],
                             ),
                             Divider(),
@@ -537,7 +489,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                       color: Colors.orange.shade700,
                                     ),
                                   ),
-                                  Divider(color: Colors.orange,),
+                                  Divider(color: Colors.orange),
                                   SizedBox(height: 8.0),
                                   TextFormField(
                                     controller: _showIngredients ? _ingredientsController : _stepsController,
@@ -566,7 +518,6 @@ class _RecipeDetailState extends State<RecipeDetail> {
                     ElevatedButton(
                       onPressed: _editRecipe,
                       style: ElevatedButton.styleFrom(
-                      
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
@@ -581,7 +532,7 @@ class _RecipeDetailState extends State<RecipeDetail> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                       padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
+                        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
                       ),
                       child: Text('Delete', style: TextStyle(fontSize: 18.0)),
                     ),

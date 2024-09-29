@@ -73,17 +73,17 @@ class _MenuState extends State<Menu> {
           children: [
             Text(
               'Menu',
-              style: GoogleFonts.poppins(
+              style: GoogleFonts.allura(
                 textStyle: TextStyle(
                   fontWeight: FontWeight.bold,
-                  fontSize: 26,
+                  fontSize: 35,
                   color: Colors.orange.shade500,
                 ),
               ),
             ),
           ],
         ),
-        centerTitle: false,
+       
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(16.0),

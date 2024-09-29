@@ -3,7 +3,6 @@ import 'package:cook_n_eat/screens/recipedet.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
-
 class FavoritePage extends StatefulWidget {
   @override
   _FavoritePageState createState() => _FavoritePageState();
@@ -31,7 +30,9 @@ class _FavoritePageState extends State<FavoritePage> {
             .get();
 
         setState(() {
-          _favoriteRecipes = favDocs.docs.map((doc) => doc.data() as Map<String, dynamic>).toList();
+          _favoriteRecipes = favDocs.docs
+              .map((doc) => doc.data() as Map<String, dynamic>)
+              .toList();
           _isLoading = false;
         });
       }
@@ -43,10 +44,58 @@ class _FavoritePageState extends State<FavoritePage> {
     }
   }
 
+  // Function to sort recipes based on selected filter (Ascending/Descending)
+  void _sortRecipes(String criteria) {
+    setState(() {
+      if (criteria == 'Ascending') {
+        _favoriteRecipes.sort((a, b) {
+          String nameA = (a['recipeName'] as String).toLowerCase();
+          String nameB = (b['recipeName'] as String).toLowerCase();
+          return nameA.compareTo(nameB);
+        });
+      } else if (criteria == 'Descending') {
+        _favoriteRecipes.sort((a, b) {
+          String nameA = (a['recipeName'] as String).toLowerCase();
+          String nameB = (b['recipeName'] as String).toLowerCase();
+          return nameB.compareTo(nameA);
+        });
+      }
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Favorites')),
+      backgroundColor: Colors.orange[200],
+      appBar: PreferredSize(
+        preferredSize: Size.fromHeight(60.0),
+        child: AppBar(
+          leading: IconButton(
+            icon: Icon(Icons.arrow_back), 
+            onPressed: () {
+              Navigator.pop(context); 
+            },
+          ),
+          title: Text('Favorites'),
+          backgroundColor: Colors.transparent,
+          actions: [
+            PopupMenuButton<String>(
+              onSelected: _sortRecipes,
+              icon: Icon(Icons.sort),
+              itemBuilder: (context) => [
+                PopupMenuItem(
+                  value: 'Ascending',
+                  child: Text('Ascending (A-Z)'),
+                ),
+                PopupMenuItem(
+                  value: 'Descending',
+                  child: Text('Descending (Z-A)'),
+                ),
+              ],
+            ),
+          ],
+        ),
+      ),
       body: _isLoading
           ? Center(child: CircularProgressIndicator())
           : _favoriteRecipes.isEmpty
@@ -57,8 +106,6 @@ class _FavoritePageState extends State<FavoritePage> {
                     final recipe = _favoriteRecipes[index];
                     final recipeName = recipe['recipeName'] ?? 'No name';
                     final imageUrl = recipe['imageUrl'] ?? '';
-                    final ingredients = recipe['ingredients'] ?? 'No ingredients';
-                    final steps = recipe['steps'] ?? 'No steps';
                     final collectionName = recipe['collectionName'] ?? '';
 
                     return GestureDetector(
@@ -69,13 +116,13 @@ class _FavoritePageState extends State<FavoritePage> {
                               recipeName: recipeName,
                               imageUrl: imageUrl,
                               collectionName: collectionName,
-                              // Pass the ingredients and steps if available
                             ),
                           ),
                         );
                       },
                       child: Container(
-                        margin: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                        margin: const EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 16.0),
                         decoration: BoxDecoration(
                           color: Colors.white,
                           borderRadius: BorderRadius.circular(12.0),
@@ -94,7 +141,8 @@ class _FavoritePageState extends State<FavoritePage> {
                                     width: double.infinity,
                                     height: 200.0,
                                     decoration: BoxDecoration(
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(12.0)),
                                       image: DecorationImage(
                                         image: NetworkImage(imageUrl),
                                         fit: BoxFit.cover,
@@ -105,10 +153,15 @@ class _FavoritePageState extends State<FavoritePage> {
                                     height: 200.0,
                                     decoration: BoxDecoration(
                                       color: Colors.grey[300],
-                                      borderRadius: BorderRadius.vertical(top: Radius.circular(12.0)),
+                                      borderRadius: BorderRadius.vertical(
+                                          top: Radius.circular(12.0)),
                                     ),
                                     child: Center(
-                                      child: Icon(Icons.image, size: 100.0, color: Colors.grey[600]),
+                                      child: Icon(
+                                        Icons.image,
+                                        size: 100.0,
+                                        color: Colors.grey[600],
+                                      ),
                                     ),
                                   ),
                             Positioned(
