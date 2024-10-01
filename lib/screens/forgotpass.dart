@@ -19,9 +19,8 @@ class _ForgotpassState extends State<Forgotpass> {
 
   Future<void> passwordReset() async {
     final email = _emailController.text.trim();
-    
+
     if (email.isEmpty) {
-      
       showDialog(
         context: context,
         builder: (context) {
@@ -41,7 +40,7 @@ class _ForgotpassState extends State<Forgotpass> {
       );
       return;
     }
-    
+
     try {
       await FirebaseAuth.instance.sendPasswordResetEmail(email: email);
       showDialog(
@@ -49,7 +48,8 @@ class _ForgotpassState extends State<Forgotpass> {
         builder: (context) {
           return AlertDialog(
             title: Text('Success'),
-            content: Text('Password reset link sent successfully. Check your email.'),
+            content: Text(
+                'Password reset link sent successfully. Check your email.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -77,7 +77,7 @@ class _ForgotpassState extends State<Forgotpass> {
         default:
           errorMessage = e.message ?? 'An unexpected error occurred.';
       }
-      
+
       showDialog(
         context: context,
         builder: (context) {
@@ -96,13 +96,13 @@ class _ForgotpassState extends State<Forgotpass> {
         },
       );
     } catch (e) {
-      // Catch any other exceptions that are not FirebaseAuthExceptions
       showDialog(
         context: context,
         builder: (context) {
           return AlertDialog(
             title: Text('Error'),
-            content: Text('An unexpected error occurred. Please try again later.'),
+            content:
+                Text('An unexpected error occurred. Please try again later.'),
             actions: [
               TextButton(
                 onPressed: () {
@@ -130,7 +130,6 @@ class _ForgotpassState extends State<Forgotpass> {
         ),
         child: Stack(
           children: [
-            // Back Arrow
             Positioned(
               top: 20,
               left: 20,
@@ -141,18 +140,17 @@ class _ForgotpassState extends State<Forgotpass> {
                 },
               ),
             ),
-            // Container for content
             Positioned(
-              top: 100, // Adjusted for spacing from top
+              top: 100,
               left: 20,
               right: 20,
               child: Center(
                 child: Container(
-                  width: 350, // Set fixed width
-                  height: 350, // Set fixed height to match width
+                  width: 350,
+                  height: 350,
                   decoration: BoxDecoration(
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20), // Curved corners
+                    borderRadius: BorderRadius.circular(20),
                     boxShadow: [
                       BoxShadow(
                         color: Colors.black.withOpacity(0.1),
@@ -166,7 +164,6 @@ class _ForgotpassState extends State<Forgotpass> {
                     child: Column(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        // Description Text
                         Text(
                           'Enter your email to receive a password reset link.',
                           textAlign: TextAlign.center,
@@ -176,7 +173,6 @@ class _ForgotpassState extends State<Forgotpass> {
                           ),
                         ),
                         SizedBox(height: 20),
-                        // Email Input Field
                         TextField(
                           controller: _emailController,
                           keyboardType: TextInputType.emailAddress,
@@ -185,19 +181,20 @@ class _ForgotpassState extends State<Forgotpass> {
                             border: OutlineInputBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),
-                            prefixIcon: Icon(Icons.email, color: Colors.orange.shade600),
+                            prefixIcon: Icon(Icons.email,
+                                color: Colors.orange.shade600),
                             filled: true,
                             fillColor: Colors.white,
                           ),
                         ),
                         SizedBox(height: 20),
-                        // Submit Button
                         ElevatedButton(
                           onPressed: passwordReset,
                           style: ElevatedButton.styleFrom(
                             backgroundColor: Colors.orange.shade600,
                             foregroundColor: Colors.white,
-                            padding: EdgeInsets.symmetric(vertical: 15, horizontal: 85),
+                            padding: EdgeInsets.symmetric(
+                                vertical: 15, horizontal: 85),
                             shape: RoundedRectangleBorder(
                               borderRadius: BorderRadius.circular(12),
                             ),

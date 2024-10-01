@@ -64,9 +64,10 @@ class _LoginState extends State<Login> {
         SharedPreferences prefs;
         prefs = await SharedPreferences.getInstance();
         prefs.setBool('isLogin', true);
-        Navigator.pushReplacement(
+        Navigator.pushAndRemoveUntil(
           context,
           MaterialPageRoute(builder: (context) => Bottomnav()),
+          (Route<dynamic> route) => false,
         );
       } else {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -244,8 +245,8 @@ class _LoginState extends State<Login> {
         ),
       ),
       floatingActionButton: FloatingActionButton(
-        onPressed: () => Navigator.push(context,
-         MaterialPageRoute(builder: (context)=> OnboardingView())),
+        onPressed: () => Navigator.push(
+            context, MaterialPageRoute(builder: (context) => OnboardingView())),
         backgroundColor: Colors.orange.shade600,
         child: Icon(Icons.arrow_back, color: Colors.white),
       ),

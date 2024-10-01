@@ -5,7 +5,8 @@ class FirestoreService {
 
   Future<Map<String, dynamic>?> getRecipe(String recipeId) async {
     try {
-      DocumentSnapshot doc = await _db.collection('hp_recipe').doc(recipeId).get();
+      DocumentSnapshot doc =
+          await _db.collection('hp_recipe').doc(recipeId).get();
       if (doc.exists) {
         return doc.data() as Map<String, dynamic>?;
       }
@@ -15,15 +16,15 @@ class FirestoreService {
     return null;
   }
 
-  Future<void> saveRecipeNameByName(String oldRecipeName, String newRecipeName) async {
+  Future<void> saveRecipeNameByName(
+      String oldRecipeName, String newRecipeName) async {
     try {
-      // Query to find the document with the old recipe name
-      QuerySnapshot querySnapshot = await _db.collection('hp_recipe')
+      QuerySnapshot querySnapshot = await _db
+          .collection('hp_recipe')
           .where('name', isEqualTo: oldRecipeName)
           .get();
 
       if (querySnapshot.docs.isNotEmpty) {
-        // Update the recipe name for each matching document
         for (DocumentSnapshot doc in querySnapshot.docs) {
           await doc.reference.update({
             'name': newRecipeName,

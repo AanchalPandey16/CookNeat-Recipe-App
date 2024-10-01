@@ -1,4 +1,4 @@
-import 'dart:convert'; // Import for JSON encoding/decoding
+import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
@@ -19,14 +19,14 @@ class _RecipeListState extends State<RecipeList>
   final TextEditingController _searchController = TextEditingController();
   bool _isSearching = false;
   String _searchQuery = '';
-  List<Map<String, dynamic>> _cachedRecipes = []; // Store cached recipes
-  bool _isLoading = true; // Track loading state
+  List<Map<String, dynamic>> _cachedRecipes = [];
+  bool _isLoading = true;
 
   @override
   void initState() {
     super.initState();
-    _loadCachedRecipes(); // Load cached recipes if available
-    _fetchRecipes(); // Fetch recipes from Firestore
+    _loadCachedRecipes();
+    _fetchRecipes();
   }
 
   Future<void> _loadCachedRecipes() async {
@@ -34,8 +34,9 @@ class _RecipeListState extends State<RecipeList>
     final cachedData = prefs.getString('cachedRecipes');
     if (cachedData != null) {
       setState(() {
-        _cachedRecipes = List<Map<String, dynamic>>.from(json.decode(cachedData));
-        _isLoading = false; // Set loading to false after loading cached data
+        _cachedRecipes =
+            List<Map<String, dynamic>>.from(json.decode(cachedData));
+        _isLoading = false;
       });
     }
   }
@@ -49,7 +50,7 @@ class _RecipeListState extends State<RecipeList>
     final userId = FirebaseAuth.instance.currentUser?.uid;
     if (userId == null) {
       setState(() {
-        _isLoading = false; // Set loading to false if no user is logged in
+        _isLoading = false;
       });
       return;
     }
@@ -63,14 +64,14 @@ class _RecipeListState extends State<RecipeList>
           .map((doc) => doc.data() as Map<String, dynamic>)
           .toList();
       setState(() {
-        _cachedRecipes = recipes; // Update cached recipes
-        _isLoading = false; // Set loading to false after fetching
+        _cachedRecipes = recipes;
+        _isLoading = false;
       });
-      await _cacheRecipes(recipes); // Cache them
+      await _cacheRecipes(recipes);
     } catch (e) {
       print('Error fetching recipes: $e');
       setState(() {
-        _isLoading = false; // Set loading to false on error
+        _isLoading = false;
       });
     }
   }
@@ -86,11 +87,11 @@ class _RecipeListState extends State<RecipeList>
   }
 
   @override
-  bool get wantKeepAlive => true; // Keep the state alive
+  bool get wantKeepAlive => true;
 
   @override
   Widget build(BuildContext context) {
-    super.build(context); // Call super.build to maintain keep-alive status
+    super.build(context);
 
     return Scaffold(
       backgroundColor: Colors.orange[200],
@@ -125,7 +126,7 @@ class _RecipeListState extends State<RecipeList>
             Expanded(
               child: _isLoading
                   ? Center(
-                      child: CircularProgressIndicator(), // Show a loading indicator while fetching data
+                      child: CircularProgressIndicator(),
                     )
                   : ListView.builder(
                       padding: EdgeInsets.all(10.0),
@@ -151,7 +152,8 @@ class _RecipeListState extends State<RecipeList>
                               Navigator.push(
                                 context,
                                 MaterialPageRoute(
-                                  builder: (context) => RecipeDetail(recipe: recipe),
+                                  builder: (context) =>
+                                      RecipeDetail(recipe: recipe),
                                 ),
                               );
                             },
@@ -168,12 +170,15 @@ class _RecipeListState extends State<RecipeList>
                                       width: double.infinity,
                                       color: Colors.grey[300],
                                     ),
-                                    errorWidget: (context, url, error) => Icon(Icons.error),
-                                    imageBuilder: (context, imageProvider) => Container(
+                                    errorWidget: (context, url, error) =>
+                                        Icon(Icons.error),
+                                    imageBuilder: (context, imageProvider) =>
+                                        Container(
                                       height: 190,
                                       width: double.infinity,
                                       decoration: BoxDecoration(
-                                        borderRadius: BorderRadius.vertical(top: Radius.circular(20.0)),
+                                        borderRadius: BorderRadius.vertical(
+                                            top: Radius.circular(20.0)),
                                         image: DecorationImage(
                                           image: imageProvider,
                                           fit: BoxFit.cover,
@@ -182,7 +187,10 @@ class _RecipeListState extends State<RecipeList>
                                       child: Container(
                                         decoration: BoxDecoration(
                                           gradient: LinearGradient(
-                                            colors: [Colors.black.withOpacity(0.3), Colors.transparent],
+                                            colors: [
+                                              Colors.black.withOpacity(0.3),
+                                              Colors.transparent
+                                            ],
                                             begin: Alignment.bottomCenter,
                                             end: Alignment.topCenter,
                                           ),
@@ -195,7 +203,8 @@ class _RecipeListState extends State<RecipeList>
                                   left: 0,
                                   right: 0,
                                   child: Container(
-                                    padding: EdgeInsets.symmetric(horizontal: 12.0, vertical: 8.0),
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 12.0, vertical: 8.0),
                                     decoration: BoxDecoration(
                                       color: Colors.black.withOpacity(0.6),
                                     ),
@@ -242,7 +251,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
   @override
   void initState() {
     super.initState();
-    _ingredientsController = TextEditingController(text: widget.recipe['ingredients']);
+    _ingredientsController =
+        TextEditingController(text: widget.recipe['ingredients']);
     _stepsController = TextEditingController(text: widget.recipe['steps']);
   }
 
@@ -362,7 +372,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   width: double.infinity,
                                   height: 300.0,
                                   decoration: BoxDecoration(
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                    borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(16.0)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black26,
@@ -372,13 +383,18 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                     ],
                                   ),
                                   child: ClipRRect(
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                    borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(16.0)),
                                     child: CachedNetworkImage(
                                       imageUrl: widget.recipe['image'],
                                       fit: BoxFit.cover,
-                                      placeholder: (context, url) => Center(child: CircularProgressIndicator()),
-                                      errorWidget: (context, url, error) => Center(
-                                        child: Icon(Icons.image, size: 60.0, color: Colors.grey[600]),
+                                      placeholder: (context, url) => Center(
+                                          child: CircularProgressIndicator()),
+                                      errorWidget: (context, url, error) =>
+                                          Center(
+                                        child: Icon(Icons.image,
+                                            size: 60.0,
+                                            color: Colors.grey[600]),
                                       ),
                                     ),
                                   ),
@@ -387,7 +403,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   height: 300.0,
                                   decoration: BoxDecoration(
                                     color: Colors.grey[300],
-                                    borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                    borderRadius: BorderRadius.vertical(
+                                        bottom: Radius.circular(16.0)),
                                     boxShadow: [
                                       BoxShadow(
                                         color: Colors.black26,
@@ -397,7 +414,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                     ],
                                   ),
                                   child: Center(
-                                    child: Icon(Icons.image, size: 60.0, color: Colors.grey[600]),
+                                    child: Icon(Icons.image,
+                                        size: 60.0, color: Colors.grey[600]),
                                   ),
                                 ),
                           Positioned(
@@ -444,7 +462,9 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   child: Text(
                                     'Ingredients',
                                     style: TextStyle(
-                                      color: _showIngredients ? Colors.orange.shade700 : Colors.black,
+                                      color: _showIngredients
+                                          ? Colors.orange.shade700
+                                          : Colors.black,
                                     ),
                                   ),
                                 ),
@@ -457,7 +477,9 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   child: Text(
                                     'Steps',
                                     style: TextStyle(
-                                      color: !_showIngredients ? Colors.orange.shade700 : Colors.black,
+                                      color: !_showIngredients
+                                          ? Colors.orange.shade700
+                                          : Colors.black,
                                     ),
                                   ),
                                 ),
@@ -466,7 +488,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                             Divider(thickness: 1),
                             SizedBox(height: 16.0),
                             Container(
-                              padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 16.0),
+                              padding: EdgeInsets.symmetric(
+                                  vertical: 16.0, horizontal: 16.0),
                               decoration: BoxDecoration(
                                 color: Colors.white,
                                 borderRadius: BorderRadius.circular(12.0),
@@ -492,7 +515,9 @@ class _RecipeDetailState extends State<RecipeDetail> {
                                   Divider(color: Colors.orange),
                                   SizedBox(height: 8.0),
                                   TextFormField(
-                                    controller: _showIngredients ? _ingredientsController : _stepsController,
+                                    controller: _showIngredients
+                                        ? _ingredientsController
+                                        : _stepsController,
                                     maxLines: null,
                                     decoration: InputDecoration(
                                       border: InputBorder.none,
@@ -521,7 +546,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 50.0),
                       ),
                       child: Text('Save', style: TextStyle(fontSize: 18.0)),
                     ),
@@ -532,7 +558,8 @@ class _RecipeDetailState extends State<RecipeDetail> {
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8.0),
                         ),
-                        padding: EdgeInsets.symmetric(vertical: 8.0, horizontal: 50.0),
+                        padding: EdgeInsets.symmetric(
+                            vertical: 8.0, horizontal: 50.0),
                       ),
                       child: Text('Delete', style: TextStyle(fontSize: 18.0)),
                     ),

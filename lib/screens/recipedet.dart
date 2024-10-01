@@ -23,10 +23,10 @@ class RecipeDetailPage extends StatefulWidget {
 }
 
 class _RecipeDetailPageState extends State<RecipeDetailPage> {
-  bool showIngredients = true; 
+  bool showIngredients = true;
   Map<String, dynamic>? recipeData;
   bool isFavorited = false;
-  bool isImageCached = false; // Track if the image has been cached
+  bool isImageCached = false;
 
   @override
   void initState() {
@@ -46,11 +46,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
         setState(() {
           recipeData = snapshot.data() as Map<String, dynamic>?;
 
-          // Pre-cache the image after setting the recipe data
           WidgetsBinding.instance.addPostFrameCallback((_) {
-            if (recipeData != null && recipeData!['imageUrl'] != null && recipeData!['imageUrl'].isNotEmpty && !isImageCached) {
+            if (recipeData != null &&
+                recipeData!['imageUrl'] != null &&
+                recipeData!['imageUrl'].isNotEmpty &&
+                !isImageCached) {
               precacheImage(NetworkImage(recipeData!['imageUrl']), context);
-              isImageCached = true; // Set to true after caching
+              isImageCached = true;
             }
           });
         });
@@ -84,7 +86,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
       final response = await http.get(Uri.parse(imageUrl));
       if (response.statusCode == 200) {
         final directory = Directory.systemTemp;
-        final filePath = '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.png';
+        final filePath =
+            '${directory.path}/${DateTime.now().millisecondsSinceEpoch}.png';
         final file = File(filePath);
         await file.writeAsBytes(response.bodyBytes);
         return filePath;
@@ -136,14 +139,12 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
           .collection('recipes');
 
       if (isFavorited) {
-        // Remove recipe from favorites
         await favCollection.doc(widget.recipeName).delete();
       } else {
-        // Add recipe to favorites
         await favCollection.doc(widget.recipeName).set({
           'recipeName': widget.recipeName,
           'imageUrl': widget.imageUrl,
-          'collectionName': widget.collectionName, // Ensure this field is added
+          'collectionName': widget.collectionName,
         });
       }
 
@@ -154,11 +155,18 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
   }
 
   String _formatIngredients(String ingredients) {
-    return ingredients.split(',').map((ingredient) => ingredient.trim()).join('\n');
+    return ingredients
+        .split(',')
+        .map((ingredient) => '• ${ingredient.trim()}')
+        .join('\n');
   }
 
   String _formatSteps(String steps) {
-    return steps.split('.').map((step) => step.trim()).where((step) => step.isNotEmpty).join('.\n');
+    return steps
+        .split('.')
+        .map((step) => '• ${step.trim()}.')
+        .where((step) => step.isNotEmpty)
+        .join('\n');
   }
 
   @override
@@ -170,7 +178,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
             children: [
               Expanded(
                 child: recipeData == null
-                    ? Center(child: CircularProgressIndicator(valueColor: AlwaysStoppedAnimation<Color>(Colors.orange[200]!)))
+                    ? Center(
+                        child: CircularProgressIndicator(
+                            valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.orange[200]!)))
                     : SingleChildScrollView(
                         child: Column(
                           crossAxisAlignment: CrossAxisAlignment.start,
@@ -182,7 +193,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         width: double.infinity,
                                         height: 300.0,
                                         decoration: BoxDecoration(
-                                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                          borderRadius: BorderRadius.vertical(
+                                              bottom: Radius.circular(16.0)),
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black26,
@@ -192,7 +204,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                           ],
                                         ),
                                         child: ClipRRect(
-                                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                          borderRadius: BorderRadius.vertical(
+                                              bottom: Radius.circular(16.0)),
                                           child: Image.network(
                                             recipeData!['imageUrl'],
                                             fit: BoxFit.cover,
@@ -203,7 +216,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         height: 300.0,
                                         decoration: BoxDecoration(
                                           color: Colors.grey[300],
-                                          borderRadius: BorderRadius.vertical(bottom: Radius.circular(16.0)),
+                                          borderRadius: BorderRadius.vertical(
+                                              bottom: Radius.circular(16.0)),
                                           boxShadow: [
                                             BoxShadow(
                                               color: Colors.black26,
@@ -213,14 +227,17 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                           ],
                                         ),
                                         child: Center(
-                                          child: Icon(Icons.image, size: 60.0, color: Colors.grey[600]),
+                                          child: Icon(Icons.image,
+                                              size: 60.0,
+                                              color: Colors.grey[600]),
                                         ),
                                       ),
                                 Positioned(
                                   top: 30.0,
                                   left: 10.0,
                                   child: IconButton(
-                                    icon: Icon(Icons.arrow_back, color: Colors.white),
+                                    icon: Icon(Icons.arrow_back,
+                                        color: Colors.white),
                                     onPressed: () {
                                       Navigator.of(context).pop();
                                     },
@@ -234,7 +251,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                 crossAxisAlignment: CrossAxisAlignment.start,
                                 children: [
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
                                       Expanded(
                                         child: Text(
@@ -250,8 +268,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         children: [
                                           IconButton(
                                             icon: Icon(
-                                              isFavorited ? Icons.favorite : Icons.favorite_border,
-                                              color: isFavorited ? Colors.orange.shade600 : Colors.black, size: 29,
+                                              isFavorited
+                                                  ? Icons.favorite
+                                                  : Icons.favorite_border,
+                                              color: isFavorited
+                                                  ? Colors.orange.shade600
+                                                  : Colors.black,
+                                              size: 29,
                                             ),
                                             onPressed: _toggleFavorite,
                                           ),
@@ -265,7 +288,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                   ),
                                   Divider(),
                                   Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceAround,
                                     children: [
                                       TextButton(
                                         onPressed: () {
@@ -276,7 +300,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         child: Text(
                                           'Ingredients',
                                           style: TextStyle(
-                                            color: showIngredients ? Colors.orange.shade700 : Colors.black,
+                                            color: showIngredients
+                                                ? Colors.orange.shade700
+                                                : Colors.black,
                                           ),
                                         ),
                                       ),
@@ -289,7 +315,9 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         child: Text(
                                           'Steps',
                                           style: TextStyle(
-                                            color: !showIngredients ? Colors.orange.shade700 : Colors.black,
+                                            color: !showIngredients
+                                                ? Colors.orange.shade700
+                                                : Colors.black,
                                           ),
                                         ),
                                       ),
@@ -298,7 +326,8 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                   Divider(thickness: 1),
                                   SizedBox(height: 16.0),
                                   Container(
-                                    padding: EdgeInsets.symmetric(vertical: 16.0, horizontal: 12.0),
+                                    padding: EdgeInsets.symmetric(
+                                        vertical: 16.0, horizontal: 12.0),
                                     decoration: BoxDecoration(
                                       color: Colors.white,
                                       borderRadius: BorderRadius.circular(12.0),
@@ -311,10 +340,13 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                       ],
                                     ),
                                     child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
                                       children: [
                                         Text(
-                                          showIngredients ? 'Ingredients' : 'Steps',
+                                          showIngredients
+                                              ? 'Ingredients'
+                                              : 'Steps',
                                           style: TextStyle(
                                             fontSize: 20.0,
                                             fontWeight: FontWeight.w600,
@@ -324,8 +356,10 @@ class _RecipeDetailPageState extends State<RecipeDetailPage> {
                                         SizedBox(height: 8.0),
                                         Text(
                                           showIngredients
-                                              ? _formatIngredients(recipeData!['ingredients'])
-                                              : _formatSteps(recipeData!['steps']),
+                                              ? _formatIngredients(
+                                                  recipeData!['ingredients'])
+                                              : _formatSteps(
+                                                  recipeData!['steps']),
                                           style: TextStyle(fontSize: 16.0),
                                         ),
                                       ],

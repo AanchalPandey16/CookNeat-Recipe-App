@@ -4,7 +4,8 @@ import 'package:cook_n_eat/services/auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cook_n_eat/screens/homepage.dart';
 import 'package:cook_n_eat/screens/login.dart';
-import 'package:firebase_auth/firebase_auth.dart'; 
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart'; 
 
 class SignIn extends StatefulWidget {
   const SignIn({super.key});
@@ -68,22 +69,34 @@ Future<void> _register() async {
     final email = _emailController.text.trim();
     final password = _passwordController.text.trim();
 
-    final user = await _authService.registerWithEmailAndPassword(name, email, password);
+    try {
+      final user = await _authService.registerWithEmailAndPassword(name, email, password);
 
-    if (user != null) {
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => Bottomnav()),
-      );
-    } else {
+      if (user != null) {
+        SharedPreferences prefs = await SharedPreferences.getInstance();
+        prefs.setBool('isLogin', true);
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => Bottomnav()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage;
+      if (e.code == 'email-already-in-use') {
+        errorMessage = 'This email is already registered.';
+      } else if (e.code == 'weak-password') {
+        errorMessage = 'The password is too weak.';
+      } else {
+        errorMessage = 'Registration failed. Please try again.';
+      }
+
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(
-          content: Text('Registration failed. Please check your details and try again.'),
-        ),
+        SnackBar(content: Text(errorMessage)),
       );
     }
   }
 }
+
 
 
   @override

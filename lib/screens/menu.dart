@@ -66,6 +66,7 @@ class _MenuState extends State<Menu> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
+        automaticallyImplyLeading: false,
         backgroundColor: Colors.transparent,
         shadowColor: Colors.black.withOpacity(0.5),
         title: Row(
@@ -83,7 +84,6 @@ class _MenuState extends State<Menu> {
             ),
           ],
         ),
-       
       ),
       body: ListView.builder(
         padding: EdgeInsets.all(16.0),
@@ -105,7 +105,8 @@ class _MenuState extends State<Menu> {
     );
   }
 
-  Widget _buildMenuItem(BuildContext context, String category, String imageUrl) {
+  Widget _buildMenuItem(
+      BuildContext context, String category, String imageUrl) {
     return GestureDetector(
       onTap: () {
         Navigator.push(
@@ -138,7 +139,8 @@ class _MenuState extends State<Menu> {
                 fit: BoxFit.cover,
                 placeholder: (context, url) => Center(
                   child: CircularProgressIndicator(
-                    valueColor: AlwaysStoppedAnimation<Color>(Colors.orange[200]!),
+                    valueColor:
+                        AlwaysStoppedAnimation<Color>(Colors.orange[200]!),
                   ),
                 ),
                 errorWidget: (context, url, error) => Icon(Icons.error),
@@ -151,7 +153,8 @@ class _MenuState extends State<Menu> {
               child: Container(
                 padding: EdgeInsets.all(14.0),
                 decoration: BoxDecoration(
-                  borderRadius: BorderRadius.vertical(bottom: Radius.circular(15.0)),
+                  borderRadius:
+                      BorderRadius.vertical(bottom: Radius.circular(15.0)),
                   gradient: LinearGradient(
                     colors: [Colors.black54, Colors.black45],
                     begin: Alignment.topCenter,

@@ -49,13 +49,11 @@ class _AddRecipeState extends State<AddRecipe> {
         if (user != null) {
           String userId = user.uid;
 
-          // Upload image to Firebase Storage
           Reference firebaseStorageRef =
               FirebaseStorage.instance.ref().child("recipeImages").child(addId);
           final UploadTask task = firebaseStorageRef.putFile(selectedImage!);
           var downloadUrl = await (await task).ref.getDownloadURL();
 
-          // Create recipe data with userId
           Map<String, dynamic> addRecipe = {
             "name": recipeNameController.text,
             "ingredients": ingredientsController.text,
@@ -119,11 +117,13 @@ class _AddRecipeState extends State<AddRecipe> {
                     children: [
                       Text(
                         'Uploading...',
-                        style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),
+                        style: TextStyle(
+                            fontSize: 18, fontWeight: FontWeight.bold),
                       ),
                       SizedBox(height: 16.0),
                       CircularProgressIndicator(
-                        valueColor: AlwaysStoppedAnimation<Color>(Colors.orange),
+                        valueColor:
+                            AlwaysStoppedAnimation<Color>(Colors.orange),
                       ),
                     ],
                   ),
@@ -197,7 +197,8 @@ class _AddRecipeState extends State<AddRecipe> {
                                 borderRadius: BorderRadius.circular(12),
                               ),
                               padding: EdgeInsets.symmetric(
-                                horizontal: MediaQuery.of(context).size.width * 0.3,
+                                horizontal:
+                                    MediaQuery.of(context).size.width * 0.3,
                                 vertical: 14,
                               ),
                               elevation: 10.0,

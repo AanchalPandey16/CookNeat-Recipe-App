@@ -44,7 +44,6 @@ class _FavoritePageState extends State<FavoritePage> {
     }
   }
 
-  // Function to sort recipes based on selected filter (Ascending/Descending)
   void _sortRecipes(String criteria) {
     setState(() {
       if (criteria == 'Ascending') {
@@ -71,9 +70,9 @@ class _FavoritePageState extends State<FavoritePage> {
         preferredSize: Size.fromHeight(60.0),
         child: AppBar(
           leading: IconButton(
-            icon: Icon(Icons.arrow_back), 
+            icon: Icon(Icons.arrow_back),
             onPressed: () {
-              Navigator.pop(context); 
+              Navigator.pop(context);
             },
           ),
           title: Text('Favorites'),

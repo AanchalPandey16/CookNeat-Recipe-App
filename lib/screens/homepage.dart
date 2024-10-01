@@ -15,22 +15,18 @@ class _HomepageState extends State<Homepage> {
   final TextEditingController _searchController = TextEditingController();
   String _selectedCategory = 'All';
 
-  // Custom cache manager for caching images immediately (0 sec)
   static final customCacheManager = CacheManager(
     Config(
       'customCacheKey',
-      stalePeriod: Duration(seconds: 0), // Cache images immediately, no delay
+      stalePeriod: Duration(seconds: 0),
       maxNrOfCacheObjects: 100,
     ),
   );
 
-  // Firestore collection name
   final String collectionName = 'hp_recipe';
 
-  // Cache for fetched recipes
   List<Map<String, dynamic>> _cachedRecipes = [];
 
-  // This variable will be used to check if we have already fetched data
   bool _isDataFetched = false;
 
   Future<void> _fetchRecipes() async {
@@ -42,10 +38,9 @@ class _HomepageState extends State<Homepage> {
           _cachedRecipes = snapshot.docs
               .map((doc) => doc.data() as Map<String, dynamic>)
               .toList();
-          _isDataFetched = true; // Mark data as fetched
+          _isDataFetched = true;
         });
-        print(
-            "Fetched from $collectionName: $_cachedRecipes"); // Debugging line
+        print("Fetched from $collectionName: $_cachedRecipes");
       }
     } catch (e) {
       print("Error fetching recipes from $collectionName: $e");
@@ -108,14 +103,12 @@ class _HomepageState extends State<Homepage> {
                   prefixIcon: Icon(Icons.search, color: Colors.orange[600]),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
-                        color: Colors.grey, width: 1.0), // Default border color
+                    borderSide: BorderSide(color: Colors.grey, width: 1.0),
                   ),
                   focusedBorder: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(20),
-                    borderSide: BorderSide(
-                        color: Colors.orange[200]!,
-                        width: 2.0), // Focused border color
+                    borderSide:
+                        BorderSide(color: Colors.orange[200]!, width: 2.0),
                   ),
                   filled: true,
                   fillColor: Colors.grey[200],
@@ -138,7 +131,6 @@ class _HomepageState extends State<Homepage> {
                   ],
                 ),
               ),
-             
               const SizedBox(height: 20),
               Text(
                 'Best Picks:',
@@ -171,7 +163,6 @@ class _HomepageState extends State<Homepage> {
       return recipe['category'] == _selectedCategory;
     }).toList();
 
-    // Further filter by search query
     var searchQuery = _searchController.text.toLowerCase();
     var filteredBySearch = filteredByCategory.where((recipe) {
       var name = recipe['name']?.toLowerCase() ?? '';
@@ -186,7 +177,6 @@ class _HomepageState extends State<Homepage> {
       children: filteredBySearch.map((recipe) {
         return GestureDetector(
           onTap: () {
-           
             if (recipe['imageUrl'] != null && recipe['imageUrl'].isNotEmpty) {
               precacheImage(
                 CachedNetworkImageProvider(recipe['imageUrl']),
@@ -283,7 +273,11 @@ class _HomepageState extends State<Homepage> {
         ),
         child: Row(
           children: [
-            Icon(icon, size: 20, color: Colors.white,),
+            Icon(
+              icon,
+              size: 20,
+              color: Colors.white,
+            ),
             SizedBox(width: 5),
             Text(category),
           ],

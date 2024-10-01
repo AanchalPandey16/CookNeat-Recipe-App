@@ -26,7 +26,7 @@ class FirebaseService {
 
       final favoriteRecipes = querySnapshot.docs.map((doc) {
         final data = doc.data();
-        print('Document data: $data'); // Debugging line
+        print('Document data: $data'); 
         return data;
       }).toList();
 

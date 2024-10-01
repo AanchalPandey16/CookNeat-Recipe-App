@@ -144,7 +144,6 @@ class _ProfileState extends State<Profile> {
       }
     }
   }
-  
 
   void _showOptionsDialog() {
     showDialog(
@@ -270,7 +269,6 @@ class _ProfileState extends State<Profile> {
     await _saveProfile();
   }
 
-
   void _showSettingsDrawer() {
     showModalBottomSheet(
       context: context,
@@ -289,7 +287,10 @@ class _ProfileState extends State<Profile> {
             mainAxisSize: MainAxisSize.min,
             children: [
               ListTile(
-                leading: Icon(Icons.feedback,color: Colors.orange[600],),
+                leading: Icon(
+                  Icons.feedback,
+                  color: Colors.orange[600],
+                ),
                 title: Text('Feedback'),
                 onTap: () {
                   Navigator.pop(context);
@@ -319,8 +320,7 @@ class _ProfileState extends State<Profile> {
                   controller: _feedbackController,
                   decoration: InputDecoration(
                     labelText: 'Enter your feedback here',
-                    labelStyle: TextStyle(
-                        color: Colors.orange[600]), // Orange color for label
+                    labelStyle: TextStyle(color: Colors.orange[600]),
                   ),
                   maxLines: 4,
                 ),
@@ -328,7 +328,7 @@ class _ProfileState extends State<Profile> {
             ),
           ),
           shape: RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(10), // Less circular
+            borderRadius: BorderRadius.circular(10),
           ),
           actions: [
             TextButton(
@@ -369,7 +369,7 @@ class _ProfileState extends State<Profile> {
                 }
               },
               style: TextButton.styleFrom(
-                foregroundColor: Colors.orange[600], // Orange color for text
+                foregroundColor: Colors.orange[600],
               ),
               child: Text('Send'),
             ),
@@ -388,26 +388,27 @@ class _ProfileState extends State<Profile> {
   Widget build(BuildContext context) {
     return Scaffold(
         appBar: AppBar(
-     title: Text(
-      'Profile',
-      style: GoogleFonts.allura(
-        textStyle: TextStyle(
-          fontSize: 35,
-          color:  Colors.orange.shade500,
-          fontWeight: FontWeight.bold,
-        ),
-      ),
-    ),
-    centerTitle: true,
-    iconTheme: IconThemeData(color: Colors.black),
-    actions: [
-      IconButton(
-        icon: Icon(Icons.settings, color: Colors.orange.shade600),
-        onPressed: _showSettingsDrawer,
-      ),
-    ],
-    backgroundColor: Colors.transparent,
-    elevation: 0,
+          automaticallyImplyLeading: false,
+          title: Text(
+            'Profile',
+            style: GoogleFonts.allura(
+              textStyle: TextStyle(
+                fontSize: 35,
+                color: Colors.orange.shade500,
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+          ),
+          centerTitle: true,
+          iconTheme: IconThemeData(color: Colors.black),
+          actions: [
+            IconButton(
+              icon: Icon(Icons.settings, color: Colors.orange.shade600),
+              onPressed: _showSettingsDrawer,
+            ),
+          ],
+          backgroundColor: Colors.transparent,
+          elevation: 0,
         ),
         body: SingleChildScrollView(
             child: Column(children: [
@@ -418,21 +419,21 @@ class _ProfileState extends State<Profile> {
                 GestureDetector(
                   onTap: _showOptionsDialog,
                   child: Container(
-                    width: 150, // Increased width
-                    height: 150, // Increased height
+                    width: 150,
+                    height: 150,
                     decoration: BoxDecoration(
                       shape: BoxShape.circle,
                       color: Colors.grey[200],
                       border: Border.all(
-                        color: Colors.orange.shade400, // Border color
-                        width: 1,// Border width
+                        color: Colors.orange.shade400,
+                        width: 1,
                       ),
                       boxShadow: [
                         BoxShadow(
-                          color: Colors.grey.withOpacity(0.5), // Shadow color
-                          spreadRadius: 3, // Spread radius
-                          blurRadius: 7, // Blur radius
-                          offset: Offset(0, 3), // Shadow offset
+                          color: Colors.grey.withOpacity(0.5),
+                          spreadRadius: 3,
+                          blurRadius: 7,
+                          offset: Offset(0, 3),
                         ),
                       ],
                     ),
@@ -441,16 +442,15 @@ class _ProfileState extends State<Profile> {
                           ? Image.memory(
                               _image!,
                               fit: BoxFit.cover,
-                              width: 140, // Adjusted width to fit container
-                              height: 140, // Adjusted height to fit container
+                              width: 140,
+                              height: 140,
                             )
                           : _profileImageUrl.isNotEmpty
                               ? Image.network(
                                   _profileImageUrl,
                                   fit: BoxFit.cover,
-                                  width: 140, // Adjusted width to fit container
-                                  height:
-                                      140, // Adjusted height to fit container
+                                  width: 140,
+                                  height: 140,
                                 )
                               : Icon(
                                   Icons.person,
@@ -488,28 +488,25 @@ class _ProfileState extends State<Profile> {
           OutlinedButton(
             onPressed: _showEditProfileDialog,
             style: OutlinedButton.styleFrom(
-              padding: EdgeInsets.symmetric(
-                  horizontal: 140,
-                  vertical:
-                      8), // Adjusted vertical padding for better appearance
+              padding: EdgeInsets.symmetric(horizontal: 140, vertical: 8),
               textStyle: TextStyle(
                 fontSize: 16,
                 fontWeight: FontWeight.bold,
-                color: Colors.orange[600], // Text color in orange
+                color: Colors.orange[600],
               ),
               side: BorderSide(
-                color: Colors.orange.shade200, // Border color
-                width: 1.1, // Border width
+                color: Colors.orange.shade200,
+                width: 1.1,
               ),
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadius.circular(5), // Border radius
+                borderRadius: BorderRadius.circular(5),
               ),
-              backgroundColor: Colors.orange[100], // Background color
+              backgroundColor: Colors.orange[100],
             ),
             child: Text(
               'Edit Profile',
               style: TextStyle(
-                color: Colors.orange[600], // Ensure text color is orange
+                color: Colors.orange[600],
               ),
             ),
           ),
@@ -571,11 +568,11 @@ class _ProfileState extends State<Profile> {
                       ),
                     ),
                     onTap: () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(builder: (context) => RecipeList()),
-                        );
-                      },
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (context) => RecipeList()),
+                      );
+                    },
                   ),
                 ),
                 SizedBox(height: 30),
@@ -636,8 +633,7 @@ class _ProfileState extends State<Profile> {
                                 child: Text("Cancel",
                                     style: TextStyle(color: Colors.black)),
                                 onPressed: () {
-                                  Navigator.of(context)
-                                      .pop(); // Close the dialog
+                                  Navigator.of(context).pop();
                                 },
                               ),
                               TextButton(

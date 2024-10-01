@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:cook_n_eat/screens/recipedet.dart'; // Ensure this path is correct
+import 'package:cook_n_eat/screens/recipedet.dart'; 
 
 class RecipeListPage extends StatelessWidget {
   final String category;
@@ -26,7 +26,7 @@ class RecipeListPage extends StatelessWidget {
             return Column(
               children: [
                 _buildRecipeItem(context, recipe['name']!, recipe['imageUrl']!),
-                SizedBox(height: 16.0), // Space between containers
+                SizedBox(height: 16.0), 
               ],
             );
           }).toList(),
@@ -44,6 +44,7 @@ class RecipeListPage extends StatelessWidget {
           {'name': 'Dal Makhni', 'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2FVegetarian%2Fdalmakhni.jpg?alt=media&token=0aeff17f-b371-4f6c-b912-7d2e0871dc9b'},
           {'name': 'Palak Paneer', 'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2FVegetarian%2Fpalakpaneer.jpg?alt=media&token=ddb930d3-1c90-45b8-a9a9-d82280d885d7'},
           {'name': 'Chole Bhature', 'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2FVegetarian%2Fcholee.jpg?alt=media&token=6b379c3a-4301-4144-807a-0cb6c56289e7'},
+          {'name': 'Mushroom Veg', 'imageUrl': 'https://firebasestorage.googleapis.com/v0/b/cookneat-4c30e.appspot.com/o/menu%2FVegetarian%2Fmsuhromm.jpg?alt=media&token=056dc63c-9746-4108-9fd6-25eb351bfabb'},
         ];
         case 'Desserts':
         return[

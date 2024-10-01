@@ -6,12 +6,12 @@ class ProfileData extends GetxController {
 
   final FirebaseFirestore _db = FirebaseFirestore.instance;
 
-  // Fetch user profile data by userId
   Future<Map<String, dynamic>> getProfile(String userId) async {
     try {
-      DocumentSnapshot snapshot = await _db.collection('profiles').doc(userId).get();
+      DocumentSnapshot snapshot =
+          await _db.collection('profiles').doc(userId).get();
       if (snapshot.exists) {
-        return snapshot.data() as Map<String, dynamic>? ?? {}; // Ensure a default empty map
+        return snapshot.data() as Map<String, dynamic>? ?? {};
       } else {
         throw Exception('Profile not found');
       }
@@ -20,9 +20,8 @@ class ProfileData extends GetxController {
     }
   }
 
-  // Create or update user profile data
-  Future<void> createOrUpdateProfile(String userId, {required String username, required String bio, String? imageUrl}) async {
-    // Input validation
+  Future<void> createOrUpdateProfile(String userId,
+      {required String username, required String bio, String? imageUrl}) async {
     if (username.isEmpty || bio.isEmpty) {
       throw Exception('Username and bio cannot be empty');
     }
@@ -31,8 +30,8 @@ class ProfileData extends GetxController {
       await _db.collection('profiles').doc(userId).set({
         'username': username,
         'bio': bio,
-        'profileImage': imageUrl ?? '', // Optional field
-      }, SetOptions(merge: true)); // Use merge to update only specified fields
+        'profileImage': imageUrl ?? '',
+      }, SetOptions(merge: true));
     } catch (e) {
       throw Exception('Error creating or updating profile: ${e.toString()}');
     }
