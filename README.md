@@ -17,6 +17,26 @@ CookNeat is a user-friendly mobile app that helps users easily create, store, an
 - **Firebase**: For secure backend services, including user authentication and recipe storage.
 - **Dart**: As the programming language for app logic.
 
+# Snapshots
+### SignIn/Login
+
+<p align="left">
+  <img src="https://github.com/user-attachments/assets/abe79a9e-69b8-4276-bdc4-c4a60c639e70" width="250" style="margin-right: 50;"/>
+  <img src="https://github.com/user-attachments/assets/4f113457-7b80-4c2b-ac91-7e03db747510" width="250"/>
+</p>
+
+### Homepage
+<img src="https://github.com/user-attachments/assets/c0e4e9a0-61f4-40d3-b07a-893ffe49cf28" width="250"/>
+
+
+### Menu Page
+<img src="https://github.com/user-attachments/assets/1a3dee41-11f4-4131-9352-0670ec5e09a3" width="250"/>
+
+### Profile Page
+<img src="https://github.com/user-attachments/assets/35ac6ab0-dc78-46d6-b550-b1e40a584fc7" width="250"/>
+
+### AddRecipe Page
+<img src="https://github.com/user-attachments/assets/917c7c91-0af2-4fa6-9ddd-7ea11ad0619a" width="250"/>
 
 
 
@@ -57,17 +77,5 @@ CookNeat is a user-friendly mobile app that helps users easily create, store, an
 
 6. **Sign In and Start Using**  
    Once the app is running, sign in or register, and start adding and managing your recipes.
-
-
-## Snapshots
-### SignIn/Login
-
-<div style="display: flex;">
-  <img src="https://github.com/user-attachments/assets/abe79a9e-69b8-4276-bdc4-c4a60c639e70" width="200" style="margin-right: 400px;"/>
-  <img src="https://github.com/user-attachments/assets/4f113457-7b80-4c2b-ac91-7e03db747510" width="200"/>
-</div>
-
-
-
 
 
