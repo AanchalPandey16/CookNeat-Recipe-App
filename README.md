@@ -1,6 +1,6 @@
-# cook_n_eat
+# Title
 
-A new Flutter project.
+CookNeat
 
 ## Getting Started
 
