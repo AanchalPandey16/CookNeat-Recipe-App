@@ -17,7 +17,7 @@ CookNeat is a user-friendly mobile app that helps users easily create, store, an
 - **Firebase**: For secure backend services, including user authentication and recipe storage.
 - **Dart**: As the programming language for app logic.
 
-# Snapshots
+## Snapshots
 ### SignIn/Login
 
 <p align="left">
