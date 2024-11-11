@@ -11,3 +11,63 @@ CookNeat is a user-friendly mobile app that helps users easily create, store, an
 - **Promote Culinary Creativity**: Encourage users to explore new dishes and document their culinary experiments and favorites.
 - **Save Time and Effort**: Focus more on cooking and less on organization with an efficient, user-friendly app.
 
+## Technologies Used
+
+- **Flutter**: For building a cross-platform mobile interface.
+- **Firebase**: For secure backend services, including user authentication and recipe storage.
+- **Dart**: As the programming language for app logic.
+
+
+
+
+## Steps to Download and Install CookNeat
+
+1. **Clone the Repository**  
+   Open your terminal or Git Bash and clone the repository by running:
+
+   ```bash
+   git clone https://github.com/yourusername/CookNeat.git
+   ```
+
+2. **Navigate to the Project Directory**  
+   After cloning the repository, go to the project folder:
+
+   ```bash
+   cd CookNeat
+   ```
+
+3. **Install Dependencies**  
+   Install all required dependencies using Flutter:
+
+   ```bash
+   flutter pub get
+   ```
+
+4. **Set Up Firebase**  
+   - Go to [Firebase Console](https://console.firebase.google.com/), create a new project, and configure it for your app.
+   - Add the `google-services.json` (for Android) and `GoogleService-Info.plist` (for iOS) to the respective directories (`android/app` and `ios/Runner`).
+   - Follow the official [FlutterFire setup guide](https://firebase.flutter.dev/docs/overview) to complete Firebase setup.
+
+5. **Run the App**  
+   After setting everything up, run the app on a connected device or emulator:
+
+   ```bash
+   flutter run
+   ```
+
+6. **Sign In and Start Using**  
+   Once the app is running, sign in or register, and start adding and managing your recipes.
+
+
+## Snapshots
+### SignIn/Login
+
+<div style="display: flex;">
+  <img src="https://github.com/user-attachments/assets/abe79a9e-69b8-4276-bdc4-c4a60c639e70" width="200" style="margin-right: 400px;"/>
+  <img src="https://github.com/user-attachments/assets/4f113457-7b80-4c2b-ac91-7e03db747510" width="200"/>
+</div>
+
+
+
+
+
